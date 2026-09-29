@@ -1,0 +1,469 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  ABA_PAYWAY
+  VISA_MASTERCARD
+  WING
+}
+
+enum RefundStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+}
+
+hasCompletedOnboarding Boolean @default(false)
+
+// Epic 1: preferred UI language ("km" | "en"), synced across devices
+language          String       @default("km")
+
+// ── Epic 2: Authentication & Profile ─────────────────────────────
+
+model Chef {
+  id                String       @id @default(uuid())
+  email             String       @unique
+  password          String?
+  displayName       String?
+  avatarUrl         String?
+  authProvider      AuthProvider @default(LOCAL)
+  googleId          String?      @unique
+
+  isEmailVerified   Boolean      @default(false)
+  emailOtp          String?
+  emailOtpExpiresAt DateTime?
+  emailOtpResendCount      Int       @default(0)
+  emailOtpResendWindowStart DateTime?
+
+  resetOtp          String?
+  resetOtpExpiresAt DateTime?
+
+  failedLoginCount  Int          @default(0)
+  lockedUntil       DateTime?
+
+  hasCompletedOnboarding Boolean @default(false)
+
+  refreshTokens     RefreshToken[]
+  subscription      Subscription?
+  transactions      Transaction[]
+  billingInfo       BillingInfo?
+  unitPreferences   ChefUnitPreference[]
+  categoryPreferences ChefCategoryPreference[]
+  ingredients       ChefIngredient[]
+  dishes            Dish[]
+  menuSets          MenuSet[]
+  events            Event[]
+  vendorPresets     VendorPreset[]
+
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@map("chefs")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  chefId    String
+  chef      Chef     @relation(fields: [chefId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+  @@index([chefId])
+}
+
+// ── Epic 3/7/8: Catalog (Global) + Per-Chef Preferences ──────────
+
+model Unit {
+  id             String       @id @default(uuid())
+  name           String       @unique
+  abbreviation   String
+  unitType       String       // "weight" | "volume" | "count"
+  conversionRate Float
+
+  createdByChefId String?
+
+  ingredients     Ingredient[]
+  chefPreferences ChefUnitPreference[]
+  chefIngredients ChefIngredient[]
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("units")
+}
+
+model Category {
+  id          String       @id @default(uuid())
+  name        String       @unique
+
+  createdByChefId String?
+
+  ingredients Ingredient[]
+  chefPreferences ChefCategoryPreference[]
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("categories")
+}
+
+model Ingredient {
+  id            String    @id @default(uuid())
+  name          String    @unique
+
+  categoryId    String?
+  category      Category? @relation(fields: [categoryId], references: [id])
+
+  defaultUnitId String?
+  defaultUnit   Unit?     @relation(fields: [defaultUnitId], references: [id])
+
+  chefIngredients        ChefIngredient[]
+  vendorPresetLinks      VendorPresetIngredient[]
+  eventPurchaseLinks     EventPurchaseStatus[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("ingredients")
+  @@index([categoryId])
+}
+
+model ChefUnitPreference {
+  id       String  @id @default(uuid())
+  chefId   String
+  chef     Chef    @relation(fields: [chefId], references: [id])
+  unitId   String
+  unit     Unit    @relation(fields: [unitId], references: [id])
+  isActive Boolean @default(true) // US-30
+
+  createdAt DateTime @default(now())
+
+  @@unique([chefId, unitId])
+  @@map("chef_unit_preferences")
+  @@index([chefId])
+}
+
+model ChefCategoryPreference {
+  id         String   @id @default(uuid())
+  chefId     String
+  chef       Chef     @relation(fields: [chefId], references: [id])
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  isActive   Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@unique([chefId, categoryId])
+  @@map("chef_category_preferences")
+  @@index([chefId])
+}
+
+model ChefIngredient {
+  id            String     @id @default(uuid())
+  chefId        String
+  chef          Chef       @relation(fields: [chefId], references: [id])
+  ingredientId  String
+  ingredient    Ingredient @relation(fields: [ingredientId], references: [id])
+
+  purchasePrice Float
+  unitId        String
+  unit          Unit       @relation(fields: [unitId], references: [id])
+
+  isActive      Boolean    @default(true) // US-35
+
+  dishIngredients DishIngredient[]
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([chefId, ingredientId])
+  @@map("chef_ingredients")
+  @@index([chefId])
+}
+
+// ── Epic 4: Subscription & Plan Management ───────────────────────
+
+model Plan {
+  id           String    @id @default(uuid())
+  name         String    @unique
+  price        Float
+  billingCycle String    // "trial" | "monthly" | "yearly"
+  durationDays Int
+  features     Json?
+  isActive     Boolean   @default(true)
+
+  subscriptions Subscription[]
+  transactions  Transaction[]
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("plans")
+}
+
+model Subscription {
+  id          String             @id @default(uuid())
+  chefId      String             @unique
+  chef        Chef               @relation(fields: [chefId], references: [id])
+
+  planId      String
+  plan        Plan               @relation(fields: [planId], references: [id])
+
+  status      SubscriptionStatus @default(TRIALING)
+  startDate   DateTime           @default(now())
+  endDate     DateTime
+  autoRenew   Boolean            @default(true)
+  canceledAt  DateTime?
+
+  transactions Transaction[]
+
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@map("subscriptions")
+  @@index([status, endDate])
+}
+
+// ── Epic 5-6: Payment & Billing ───────────────────────────────────
+
+model Transaction {
+  id              String            @id @default(uuid())
+  chefId          String
+  chef            Chef              @relation(fields: [chefId], references: [id])
+
+  subscriptionId  String?
+  subscription    Subscription?     @relation(fields: [subscriptionId], references: [id])
+
+  planId          String?
+  plan            Plan?             @relation(fields: [planId], references: [id])
+
+  amount          Float
+  currency        String            @default("USD")
+  paymentMethod   PaymentMethod
+  status          TransactionStatus @default(PENDING)
+
+  gatewayRef      String?           @unique
+  failureReason   String?
+  invoiceNumber   String?           @unique
+
+  refundStatus    RefundStatus?
+  refundReason    String?
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@map("transactions")
+  @@index([chefId])
+  @@index([status])
+}
+
+model BillingInfo {
+  id           String   @id @default(uuid())
+  chefId       String   @unique
+  chef         Chef     @relation(fields: [chefId], references: [id])
+
+  billingName  String?
+  shopAddress  String?
+  phoneNumber  String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("billing_info")
+}
+
+// ── Epic 9: Dish & Recipe Management ──────────────────────────────
+
+model Dish {
+  id          String   @id @default(uuid())
+  chefId      String
+  chef        Chef     @relation(fields: [chefId], references: [id])
+
+  name        String
+  description String?
+  imageUrl    String?
+  tags        String[] @default([])
+
+  totalCost   Float    @default(0)
+  isArchived  Boolean  @default(false)
+
+  ingredients   DishIngredient[]
+  menuSetDishes MenuSetDish[]
+  eventDishes   EventDish[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("dishes")
+  @@index([chefId])
+}
+
+model DishIngredient {
+  id               String         @id @default(uuid())
+  dishId           String
+  dish             Dish           @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  chefIngredientId String
+  chefIngredient   ChefIngredient @relation(fields: [chefIngredientId], references: [id])
+  quantityUsed     Float
+
+  @@unique([dishId, chefIngredientId])
+  @@map("dish_ingredients")
+  @@index([dishId])
+  @@index([chefIngredientId])
+}
+
+// ── Epic 10: Menu Set Management ─────────────────────────────────
+
+model MenuSet {
+  id         String        @id @default(uuid())
+  chefId     String
+  chef       Chef          @relation(fields: [chefId], references: [id])
+
+  name       String
+  totalCost  Float         @default(0)
+  isArchived Boolean       @default(false)
+
+  dishes     MenuSetDish[]
+  eventMenuSets EventMenuSet[]
+
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@map("menu_sets")
+  @@index([chefId])
+}
+
+model MenuSetDish {
+  id        String  @id @default(uuid())
+  menuSetId String
+  menuSet   MenuSet @relation(fields: [menuSetId], references: [id], onDelete: Cascade)
+  dishId    String
+  dish      Dish    @relation(fields: [dishId], references: [id])
+  sortOrder Int     @default(0)
+
+  @@unique([menuSetId, dishId])
+  @@map("menu_set_dishes")
+  @@index([menuSetId])
+}
+
+// ── Epic 11: Event Management & Vendor Presets ───────────────────
+
+model Event {
+  id         String        @id @default(uuid())
+  chefId     String
+  chef       Chef          @relation(fields: [chefId], references: [id])
+
+  name       String
+  eventDate  DateTime
+  tableCount Int           @default(1)
+
+  dishes     EventDish[]
+  menuSets   EventMenuSet[]
+  purchaseStatuses EventPurchaseStatus[]
+
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@map("events")
+  @@index([chefId])
+  @@index([eventDate])
+}
+
+model EventDish {
+  id      String @id @default(uuid())
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  dishId  String
+  dish    Dish   @relation(fields: [dishId], references: [id])
+
+  @@unique([eventId, dishId])
+  @@map("event_dishes")
+  @@index([eventId])
+}
+
+model EventMenuSet {
+  id        String  @id @default(uuid())
+  eventId   String
+  event     Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  menuSetId String
+  menuSet   MenuSet @relation(fields: [menuSetId], references: [id])
+
+  @@unique([eventId, menuSetId])
+  @@map("event_menu_sets")
+  @@index([eventId])
+}
+
+model VendorPreset {
+  id     String @id @default(uuid())
+  chefId String
+  chef   Chef   @relation(fields: [chefId], references: [id])
+  name   String
+
+  ingredients VendorPresetIngredient[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([chefId, name])
+  @@map("vendor_presets")
+  @@index([chefId])
+}
+
+model VendorPresetIngredient {
+  id             String       @id @default(uuid())
+  vendorPresetId String
+  vendorPreset   VendorPreset @relation(fields: [vendorPresetId], references: [id], onDelete: Cascade)
+  ingredientId   String
+  ingredient     Ingredient   @relation(fields: [ingredientId], references: [id])
+
+  @@unique([vendorPresetId, ingredientId])
+  @@map("vendor_preset_ingredients")
+}
+
+// ── Epic 12: Procurement & Purchase Tracking ─────────────────────
+
+model EventPurchaseStatus {
+  id           String     @id @default(uuid())
+  eventId      String
+  event        Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+
+  isPurchased  Boolean    @default(false)
+  purchasedAt  DateTime?
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([eventId, ingredientId])
+  @@map("event_purchase_status")
+  @@index([eventId])
+}
