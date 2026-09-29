@@ -4,8 +4,9 @@
  * Keep the function signatures the same so callers don't need to change.
  */
 
-async function charge({ amount, currency, chefEmail, description }) {
-  // TODO: replace with real ABA PayWay checkout/charge API call
+async function charge({ amount, currency, chefEmail, description, savedToken, idempotencyKey }) {
+  // TODO: pass `idempotencyKey` as the gateway's idempotency header (US-19 Technical Note)
+  // TODO: if `savedToken` is present, charge that stored card instead of prompting for new details
   const isSuccess = Math.random() > 0.1;
 
   if (!isSuccess) {
@@ -24,7 +25,6 @@ async function charge({ amount, currency, chefEmail, description }) {
 }
 
 async function verifyTransaction(gatewayRef) {
-  // TODO: replace with real ABA PayWay transaction status check
   return { verified: true, gatewayRef };
 }
 

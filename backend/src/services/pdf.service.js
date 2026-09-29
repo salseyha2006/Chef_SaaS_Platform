@@ -131,4 +131,28 @@ function writeInvoicePdf(doc, { transaction, language }) {
   doc.text(`${L.status}: ${L.statuses[transaction.status] || transaction.status}`);
 }
 
-module.exports = { createPdfDocument, writePurchasingListPdf, writeInvoicePdf };
+// Generic buffer-mode wrapper — used when a PDF is needed in-memory (e.g. as an email attachment)
+// rather than streamed straight to an HTTP response.
+function generatePdfBuffer(writeFn, options) {
+  return new Promise((resolve, reject) => {
+    const doc = createPdfDocument();
+    const chunks = [];
+    doc.on('data', (chunk) => chunks.push(chunk));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
+    writeFn(doc, options);
+    doc.end();
+  });
+}
+
+function generateInvoicePdfBuffer({ transaction, language }) {
+  return generatePdfBuffer(writeInvoicePdf, { transaction, language });
+}
+
+module.exports = {
+  createPdfDocument,
+  writePurchasingListPdf,
+  writeInvoicePdf,
+  generatePdfBuffer,
+  generateInvoicePdfBuffer,
+};

@@ -5,7 +5,8 @@ const subscriptionController = require('../controllers/subscription.controller')
 const paymentController = require('../controllers/payment.controller');
 const requireAuth = require('../middlewares/auth.middleware');
 const validate = require('../middlewares/validate');
-const { upgradeSubscriptionSchema } = require('../validators/billing.validator');
+// 1. បន្ថែម retryPaymentSchema ទៅក្នុង Import
+const { upgradeSubscriptionSchema, retryPaymentSchema } = require('../validators/billing.validator');
 
 router.get('/plans', subscriptionController.getPlans);
 router.get('/me', requireAuth, subscriptionController.getMySubscription);
@@ -16,6 +17,13 @@ router.post(
   subscriptionController.upgradeSubscription
 );
 router.post('/cancel', requireAuth, subscriptionController.cancelSubscription);
-router.post('/payments/:transactionId/retry', requireAuth, paymentController.retryPayment);
+router.post('/resume', requireAuth, subscriptionController.resumeSubscription);
+
+router.post(
+  '/payments/:transactionId/retry',
+  requireAuth,
+  validate(retryPaymentSchema),
+  paymentController.retryPayment
+);
 
 module.exports = router;

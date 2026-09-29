@@ -69,12 +69,14 @@ model Chef {
   lockedUntil       DateTime?
 
   hasCompletedOnboarding Boolean @default(false)
+  trialUsed              Boolean @default(false) // US-12: permanent flag, prevents re-triggering a free trial
   language          String       @default("km")
 
   refreshTokens     RefreshToken[]
   subscription      Subscription?
   transactions      Transaction[]
   billingInfo       BillingInfo?
+  savedPaymentMethods SavedPaymentMethod[]
   chefUnits         ChefUnit[]
   chefCategories    ChefCategory[]
   ingredients       ChefIngredient[]
@@ -247,6 +249,7 @@ model Plan {
   durationDays Int
   features     Json?
   isActive     Boolean   @default(true)
+  isRecommended Boolean  @default(false) // US-13 Scenario 3: highlighted plan in pricing table
 
   subscriptions Subscription[]
   transactions  Transaction[]
@@ -270,6 +273,8 @@ model Subscription {
   endDate     DateTime
   autoRenew   Boolean            @default(true)
   canceledAt  DateTime?
+  retryCount       Int       @default(0) // US-20: auto-retry attempts for the current billing cycle
+  renewalLockedAt  DateTime? // US-19 Scenario 3: idempotency claim while the cron is charging this subscription
 
   transactions Transaction[]
 
@@ -326,6 +331,25 @@ model BillingInfo {
   updatedAt    DateTime @updatedAt
 
   @@map("billing_info")
+}
+
+// US-18 Scenario 2: tokenized card reference only — never raw card data (PCI-DSS)
+model SavedPaymentMethod {
+  id           String        @id @default(uuid())
+  chefId       String
+  chef         Chef          @relation(fields: [chefId], references: [id])
+
+  provider     PaymentMethod
+  gatewayToken String        // opaque token from the gateway's own vault/tokenization
+  last4        String
+  brand        String?       // e.g. "Visa", "Mastercard" — null for wallet-style providers
+
+  isDefault    Boolean       @default(false)
+
+  createdAt    DateTime      @default(now())
+
+  @@map("saved_payment_methods")
+  @@index([chefId])
 }
 
 // ── Epic 9: Dish & Recipe Management ──────────────────────────────
