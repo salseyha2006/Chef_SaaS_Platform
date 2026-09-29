@@ -39,10 +39,11 @@ enum RefundStatus {
   REJECTED
 }
 
-hasCompletedOnboarding Boolean @default(false)
-
-// Epic 1: preferred UI language ("km" | "en"), synced across devices
-language          String       @default("km")
+// US-11 Technical Note: distinguishes a copy made from the system catalog vs. a chef's own item
+enum PresetSource {
+  PRESET
+  CUSTOM
+}
 
 // ── Epic 2: Authentication & Profile ─────────────────────────────
 
@@ -68,13 +69,14 @@ model Chef {
   lockedUntil       DateTime?
 
   hasCompletedOnboarding Boolean @default(false)
+  language          String       @default("km")
 
   refreshTokens     RefreshToken[]
   subscription      Subscription?
   transactions      Transaction[]
   billingInfo       BillingInfo?
-  unitPreferences   ChefUnitPreference[]
-  categoryPreferences ChefCategoryPreference[]
+  chefUnits         ChefUnit[]
+  chefCategories    ChefCategory[]
   ingredients       ChefIngredient[]
   dishes            Dish[]
   menuSets          MenuSet[]
@@ -99,23 +101,20 @@ model RefreshToken {
   @@index([chefId])
 }
 
-// ── Epic 3/7/8: Catalog (Global) + Per-Chef Preferences ──────────
+// ── Epic 3/7/8: Global Preset Catalog (system-owned, read-only) ─
 
 model Unit {
-  id             String       @id @default(uuid())
-  name           String       @unique
+  id             String   @id @default(uuid())
+  name           String   @unique
   abbreviation   String
-  unitType       String       // "weight" | "volume" | "count"
+  unitType       String   // "weight" | "volume" | "count"
   conversionRate Float
 
-  createdByChefId String?
+  ingredients    Ingredient[]
+  chefUnits      ChefUnit[]
 
-  ingredients     Ingredient[]
-  chefPreferences ChefUnitPreference[]
-  chefIngredients ChefIngredient[]
-
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@map("units")
 }
@@ -124,10 +123,8 @@ model Category {
   id          String       @id @default(uuid())
   name        String       @unique
 
-  createdByChefId String?
-
-  ingredients Ingredient[]
-  chefPreferences ChefCategoryPreference[]
+  ingredients     Ingredient[]
+  chefCategories  ChefCategory[]
 
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
@@ -145,9 +142,7 @@ model Ingredient {
   defaultUnitId String?
   defaultUnit   Unit?     @relation(fields: [defaultUnitId], references: [id])
 
-  chefIngredients        ChefIngredient[]
-  vendorPresetLinks      VendorPresetIngredient[]
-  eventPurchaseLinks     EventPurchaseStatus[]
+  chefIngredients ChefIngredient[]
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -156,55 +151,88 @@ model Ingredient {
   @@index([categoryId])
 }
 
-model ChefUnitPreference {
-  id       String  @id @default(uuid())
-  chefId   String
-  chef     Chef    @relation(fields: [chefId], references: [id])
-  unitId   String
-  unit     Unit    @relation(fields: [unitId], references: [id])
-  isActive Boolean @default(true) // US-30
+// ── Epic 7/8: Per-Chef owned data (Copy-on-Write) ────────────────
 
-  createdAt DateTime @default(now())
+model ChefUnit {
+  id             String       @id @default(uuid())
+  chefId         String
+  chef           Chef         @relation(fields: [chefId], references: [id])
 
-  @@unique([chefId, unitId])
-  @@map("chef_unit_preferences")
+  name           String
+  abbreviation   String
+  unitType       String
+  conversionRate Float
+
+  source         PresetSource @default(CUSTOM)
+  sourcePresetId String?
+  sourcePreset   Unit?        @relation(fields: [sourcePresetId], references: [id])
+
+  isActive       Boolean      @default(true) // US-30 soft delete
+
+  chefIngredients ChefIngredient[]
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([chefId, name])
+  @@unique([chefId, sourcePresetId])
+  @@map("chef_units")
   @@index([chefId])
 }
 
-model ChefCategoryPreference {
-  id         String   @id @default(uuid())
-  chefId     String
-  chef       Chef     @relation(fields: [chefId], references: [id])
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
-  isActive   Boolean  @default(true)
+model ChefCategory {
+  id             String       @id @default(uuid())
+  chefId         String
+  chef           Chef         @relation(fields: [chefId], references: [id])
 
-  createdAt DateTime @default(now())
+  name           String
 
-  @@unique([chefId, categoryId])
-  @@map("chef_category_preferences")
+  source         PresetSource @default(CUSTOM)
+  sourcePresetId String?
+  sourcePreset   Category?    @relation(fields: [sourcePresetId], references: [id])
+
+  isActive       Boolean      @default(true)
+
+  chefIngredients ChefIngredient[]
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([chefId, name])
+  @@unique([chefId, sourcePresetId])
+  @@map("chef_categories")
   @@index([chefId])
 }
 
 model ChefIngredient {
-  id            String     @id @default(uuid())
-  chefId        String
-  chef          Chef       @relation(fields: [chefId], references: [id])
-  ingredientId  String
-  ingredient    Ingredient @relation(fields: [ingredientId], references: [id])
+  id             String       @id @default(uuid())
+  chefId         String
+  chef           Chef         @relation(fields: [chefId], references: [id])
 
-  purchasePrice Float
-  unitId        String
-  unit          Unit       @relation(fields: [unitId], references: [id])
+  name           String
 
-  isActive      Boolean    @default(true) // US-35
+  categoryId     String?
+  category       ChefCategory? @relation(fields: [categoryId], references: [id])
 
-  dishIngredients DishIngredient[]
+  purchasePrice  Float
+  unitId         String
+  unit           ChefUnit     @relation(fields: [unitId], references: [id])
 
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  source         PresetSource @default(CUSTOM)
+  sourcePresetId String?
+  sourcePreset   Ingredient?  @relation(fields: [sourcePresetId], references: [id])
 
-  @@unique([chefId, ingredientId])
+  isActive       Boolean      @default(true) // US-35 soft delete
+
+  dishIngredients    DishIngredient[]
+  vendorPresetLinks  VendorPresetIngredient[]
+  eventPurchaseLinks EventPurchaseStatus[]
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([chefId, name])
+  @@unique([chefId, sourcePresetId])
   @@map("chef_ingredients")
   @@index([chefId])
 }
@@ -215,7 +243,7 @@ model Plan {
   id           String    @id @default(uuid())
   name         String    @unique
   price        Float
-  billingCycle String    // "trial" | "monthly" | "yearly"
+  billingCycle String
   durationDays Int
   features     Json?
   isActive     Boolean   @default(true)
@@ -351,7 +379,7 @@ model MenuSet {
   totalCost  Float         @default(0)
   isArchived Boolean       @default(false)
 
-  dishes     MenuSetDish[]
+  dishes        MenuSetDish[]
   eventMenuSets EventMenuSet[]
 
   createdAt  DateTime      @default(now())
@@ -385,8 +413,8 @@ model Event {
   eventDate  DateTime
   tableCount Int           @default(1)
 
-  dishes     EventDish[]
-  menuSets   EventMenuSet[]
+  dishes           EventDish[]
+  menuSets         EventMenuSet[]
   purchaseStatuses EventPurchaseStatus[]
 
   createdAt  DateTime      @default(now())
@@ -438,24 +466,24 @@ model VendorPreset {
 }
 
 model VendorPresetIngredient {
-  id             String       @id @default(uuid())
-  vendorPresetId String
-  vendorPreset   VendorPreset @relation(fields: [vendorPresetId], references: [id], onDelete: Cascade)
-  ingredientId   String
-  ingredient     Ingredient   @relation(fields: [ingredientId], references: [id])
+  id               String         @id @default(uuid())
+  vendorPresetId   String
+  vendorPreset     VendorPreset   @relation(fields: [vendorPresetId], references: [id], onDelete: Cascade)
+  chefIngredientId String
+  chefIngredient   ChefIngredient @relation(fields: [chefIngredientId], references: [id])
 
-  @@unique([vendorPresetId, ingredientId])
+  @@unique([vendorPresetId, chefIngredientId])
   @@map("vendor_preset_ingredients")
 }
 
 // ── Epic 12: Procurement & Purchase Tracking ─────────────────────
 
 model EventPurchaseStatus {
-  id           String     @id @default(uuid())
-  eventId      String
-  event        Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  ingredientId String
-  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  id               String         @id @default(uuid())
+  eventId          String
+  event            Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  chefIngredientId String
+  chefIngredient   ChefIngredient @relation(fields: [chefIngredientId], references: [id])
 
   isPurchased  Boolean    @default(false)
   purchasedAt  DateTime?
@@ -463,7 +491,7 @@ model EventPurchaseStatus {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  @@unique([eventId, ingredientId])
+  @@unique([eventId, chefIngredientId])
   @@map("event_purchase_status")
   @@index([eventId])
 }

@@ -69,7 +69,7 @@ const getDishDetail = asyncHandler(async (req, res) => {
     include: {
       ingredients: {
         include: {
-          chefIngredient: { include: { ingredient: true, unit: true } },
+          chefIngredient: { include: { unit: true } },
         },
       },
     },
@@ -80,7 +80,7 @@ const getDishDetail = asyncHandler(async (req, res) => {
   const breakdown = dish.ingredients.map((di) => {
     const subtotal = di.quantityUsed * di.chefIngredient.purchasePrice;
     return {
-      ingredientName: di.chefIngredient.ingredient.name,
+      ingredientName: di.chefIngredient.name,
       quantityUsed: di.quantityUsed,
       unit: di.chefIngredient.unit.abbreviation,
       unitPrice: di.chefIngredient.purchasePrice,

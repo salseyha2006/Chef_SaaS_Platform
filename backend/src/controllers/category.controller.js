@@ -3,76 +3,118 @@ const ApiError = require('../utils/ApiError');
 const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 
-// US-28: Browse Categories (Preset) with per-chef selected state
-const getCategories = asyncHandler(async (req, res) => {
+const getCategoryPresets = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
 
-  const categories = await prisma.category.findMany({
-    include: { chefPreferences: { where: { chefId } } },
+  const [presets, imported] = await Promise.all([
+    prisma.category.findMany({ orderBy: { name: 'asc' } }),
+    prisma.chefCategory.findMany({
+      where: { chefId, sourcePresetId: { not: null } },
+      select: { sourcePresetId: true },
+    }),
+  ]);
+
+  const importedIds = new Set(imported.map((c) => c.sourcePresetId));
+
+  const data = presets.map((p) => ({
+    id: p.id,
+    name: p.name,
+    isImported: importedIds.has(p.id),
+  }));
+
+  return new ApiResponse(200, data, 'Category presets fetched successfully').send(res);
+});
+
+const getMyCategories = asyncHandler(async (req, res) => {
+  const chefId = req.chef.id;
+
+  const categories = await prisma.chefCategory.findMany({
+    where: { chefId, isActive: true },
     orderBy: { name: 'asc' },
   });
 
-  const data = categories.map((c) => ({
-    id: c.id,
-    name: c.name,
-    isSelected: c.chefPreferences.length > 0 && c.chefPreferences[0].isActive,
-  }));
-
-  return new ApiResponse(200, data, 'Categories fetched successfully').send(res);
+  return new ApiResponse(200, categories, 'Your categories fetched successfully').send(res);
 });
 
-// US-28: Create Category inline and auto-select it
 const createCategory = asyncHandler(async (req, res) => {
+  const chefId = req.chef.id;
   const { name } = req.body;
-  const chefId = req.chef.id;
 
-  const existing = await prisma.category.findUnique({ where: { name } });
-  if (existing) throw ApiError.conflict('This category already exists', { code: 'CATEGORY_EXISTS' });
+  const existing = await prisma.chefCategory.findUnique({ where: { chefId_name: { chefId, name } } });
+  if (existing) {
+    throw ApiError.conflict('You already have a category with this name', { code: 'CATEGORY_EXISTS' });
+  }
 
-  const category = await prisma.category.create({
-    data: { name, createdByChefId: chefId },
-  });
+  const category = await prisma.chefCategory.create({ data: { chefId, name, source: 'CUSTOM' } });
 
-  await prisma.chefCategoryPreference.create({
-    data: { chefId, categoryId: category.id, isActive: true },
-  });
-
-  return new ApiResponse(201, category, 'Category created and added to your list').send(res);
+  return new ApiResponse(201, category, 'Category created successfully').send(res);
 });
 
-// US-29: Select an existing preset Category
-const selectCategory = asyncHandler(async (req, res) => {
+const importCategoryPreset = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
-  const { categoryId } = req.params;
+  const { presetId } = req.params;
 
-  const category = await prisma.category.findUnique({ where: { id: categoryId } });
-  if (!category) throw ApiError.notFound('Category not found', { code: 'CATEGORY_NOT_FOUND' });
+  const preset = await prisma.category.findUnique({ where: { id: presetId } });
+  if (!preset) throw ApiError.notFound('Category preset not found', { code: 'CATEGORY_NOT_FOUND' });
 
-  const preference = await prisma.chefCategoryPreference.upsert({
-    where: { chefId_categoryId: { chefId, categoryId } },
-    update: { isActive: true },
-    create: { chefId, categoryId, isActive: true },
+  const existing = await prisma.chefCategory.findUnique({
+    where: { chefId_sourcePresetId: { chefId, sourcePresetId: presetId } },
+  });
+  if (existing) {
+    throw ApiError.conflict('This category preset has already been imported', {
+      code: 'CATEGORY_ALREADY_IMPORTED',
+    });
+  }
+
+  const category = await prisma.chefCategory.create({
+    data: { chefId, name: preset.name, source: 'PRESET', sourcePresetId: preset.id },
   });
 
-  return new ApiResponse(200, preference, 'Category added to your list').send(res);
+  return new ApiResponse(201, category, 'Category imported to your list successfully').send(res);
 });
 
-// US-30: Uncheck (hide) a Category from the chef's own list
-const deselectCategory = asyncHandler(async (req, res) => {
+// US-11 Scenario 3
+const updateCategory = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
-  const { categoryId } = req.params;
+  const { id } = req.params;
+  const { name } = req.body;
 
-  const preference = await prisma.chefCategoryPreference.findUnique({
-    where: { chefId_categoryId: { chefId, categoryId } },
-  });
-  if (!preference) throw ApiError.notFound('This category is not in your list', { code: 'CATEGORY_NOT_IN_LIST' });
+  const category = await prisma.chefCategory.findUnique({ where: { id } });
+  if (!category || category.chefId !== chefId) {
+    throw ApiError.notFound('Category not found', { code: 'CATEGORY_NOT_FOUND' });
+  }
 
-  const updated = await prisma.chefCategoryPreference.update({
-    where: { chefId_categoryId: { chefId, categoryId } },
-    data: { isActive: false },
-  });
+  if (name !== category.name) {
+    const nameClash = await prisma.chefCategory.findUnique({ where: { chefId_name: { chefId, name } } });
+    if (nameClash) {
+      throw ApiError.conflict('You already have a category with this name', { code: 'CATEGORY_EXISTS' });
+    }
+  }
 
-  return new ApiResponse(200, updated, 'Category hidden from your list').send(res);
+  const updated = await prisma.chefCategory.update({ where: { id }, data: { name } });
+
+  return new ApiResponse(200, updated, 'Category updated successfully').send(res);
 });
 
-module.exports = { getCategories, createCategory, selectCategory, deselectCategory };
+const archiveCategory = asyncHandler(async (req, res) => {
+  const chefId = req.chef.id;
+  const { id } = req.params;
+
+  const category = await prisma.chefCategory.findUnique({ where: { id } });
+  if (!category || category.chefId !== chefId) {
+    throw ApiError.notFound('Category not found', { code: 'CATEGORY_NOT_FOUND' });
+  }
+
+  const updated = await prisma.chefCategory.update({ where: { id }, data: { isActive: false } });
+
+  return new ApiResponse(200, updated, 'Category archived from your list').send(res);
+});
+
+module.exports = {
+  getCategoryPresets,
+  getMyCategories,
+  createCategory,
+  importCategoryPreset,
+  updateCategory,
+  archiveCategory,
+};

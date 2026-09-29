@@ -24,7 +24,7 @@ const addItemsToEventSchema = z.object({
 
 const vendorPresetSchema = z.object({
   name: z.string().min(1, 'Vendor preset name is required'),
-  ingredientIds: z.array(z.string().uuid()).min(1),
+  chefIngredientIds: z.array(z.string().uuid()).min(1),
 });
 
 const reportItemOverrideSchema = z.object({

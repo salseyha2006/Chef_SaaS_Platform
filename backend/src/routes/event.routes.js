@@ -43,7 +43,7 @@ router.get('/:eventId/reports/excel', requireAuth, reportController.exportExcelR
 // Epic 12: Procurement & Purchase Tracking
 router.get('/:eventId/shopping-list', requireAuth, procurementController.getShoppingListWithStatus);
 router.patch(
-  '/:eventId/shopping-list/:ingredientId/toggle-purchased',
+  '/:eventId/shopping-list/:chefIngredientId/toggle-purchased',
   requireAuth,
   validate(togglePurchasedSchema),
   procurementController.togglePurchased

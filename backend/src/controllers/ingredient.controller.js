@@ -4,29 +4,32 @@ const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 const { recalculateDishesUsingChefIngredient } = require('../services/costing.service');
 
-// US-31 + US-32: Browse Global Ingredient Presets (grouped by category), synced checkbox state
+// US-31 + US-32: Browse Global Ingredient Presets (grouped by category), flagged with import state
 const getIngredientPresets = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
 
-  const ingredients = await prisma.ingredient.findMany({
-    include: {
-      category: true,
-      defaultUnit: true,
-      chefIngredients: { where: { chefId } },
-    },
-    orderBy: { name: 'asc' },
-  });
+  const [presets, imported] = await Promise.all([
+    prisma.ingredient.findMany({
+      include: { category: true, defaultUnit: true },
+      orderBy: { name: 'asc' },
+    }),
+    prisma.chefIngredient.findMany({
+      where: { chefId, sourcePresetId: { not: null } },
+      select: { sourcePresetId: true },
+    }),
+  ]);
+
+  const importedIds = new Set(imported.map((c) => c.sourcePresetId));
 
   const grouped = {};
-  for (const ing of ingredients) {
+  for (const ing of presets) {
     const categoryName = ing.category?.name || 'Uncategorized';
     if (!grouped[categoryName]) grouped[categoryName] = [];
-
     grouped[categoryName].push({
       id: ing.id,
       name: ing.name,
       defaultUnit: ing.defaultUnit ? { id: ing.defaultUnit.id, name: ing.defaultUnit.name } : null,
-      isImported: ing.chefIngredients.length > 0 && ing.chefIngredients[0].isActive,
+      isImported: importedIds.has(ing.id),
     });
   }
 
@@ -35,34 +38,117 @@ const getIngredientPresets = asyncHandler(async (req, res) => {
   return new ApiResponse(200, data, 'Ingredient presets fetched successfully').send(res);
 });
 
-// US-31 + US-33: Import selected ingredients with custom pricing & unit (bulk)
+// Ensures this chef has a ChefCategory copy matching the given global Category preset,
+// creating one silently if needed. Returns null if the preset has no category.
+async function ensureChefCategoryForPreset(chefId, globalCategoryId) {
+  if (!globalCategoryId) return null;
+
+  const existing = await prisma.chefCategory.findUnique({
+    where: { chefId_sourcePresetId: { chefId, sourcePresetId: globalCategoryId } },
+  });
+  if (existing) return existing.id;
+
+  const preset = await prisma.category.findUnique({ where: { id: globalCategoryId } });
+  if (!preset) return null;
+
+  // Name already taken by an unrelated custom category — fall back to uncategorized instead of failing the import
+  const nameClash = await prisma.chefCategory.findUnique({
+    where: { chefId_name: { chefId, name: preset.name } },
+  });
+  if (nameClash) return nameClash.id;
+
+  const created = await prisma.chefCategory.create({
+    data: { chefId, name: preset.name, source: 'PRESET', sourcePresetId: preset.id },
+  });
+  return created.id;
+}
+
+// US-31 + US-33: Import (copy) selected presets into this chef's own ingredient list
 const importIngredients = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { items } = req.body;
 
-  const ingredientIds = items.map((i) => i.ingredientId);
-  const foundCount = await prisma.ingredient.count({ where: { id: { in: ingredientIds } } });
-  if (foundCount !== ingredientIds.length) {
-    throw ApiError.badRequest('One or more ingredients do not exist', [], { code: 'INGREDIENTS_NOT_FOUND' });
+  const presetIds = items.map((i) => i.ingredientId);
+  const presets = await prisma.ingredient.findMany({ where: { id: { in: presetIds } } });
+  if (presets.length !== presetIds.length) {
+    throw ApiError.badRequest('One or more ingredients do not exist', [], {
+      code: 'INGREDIENTS_NOT_FOUND',
+    });
+  }
+  const presetById = new Map(presets.map((p) => [p.id, p]));
+
+  const unitIds = [...new Set(items.map((i) => i.unitId))];
+  const ownedUnitsCount = await prisma.chefUnit.count({ where: { id: { in: unitIds }, chefId } });
+  if (ownedUnitsCount !== unitIds.length) {
+    throw ApiError.badRequest('One or more units are not in your list', [], { code: 'UNIT_NOT_IN_LIST' });
   }
 
-  const results = await prisma.$transaction(
-    items.map((item) =>
-      prisma.chefIngredient.upsert({
-        where: { chefId_ingredientId: { chefId, ingredientId: item.ingredientId } },
-        update: { purchasePrice: item.purchasePrice, unitId: item.unitId, isActive: true },
-        create: {
-          chefId,
-          ingredientId: item.ingredientId,
-          purchasePrice: item.purchasePrice,
-          unitId: item.unitId,
-          isActive: true,
-        },
-      })
-    )
-  );
+  const created = [];
+  for (const item of items) {
+    const preset = presetById.get(item.ingredientId);
 
-  return new ApiResponse(201, results, 'Ingredients imported to your stock successfully').send(res);
+    const alreadyImported = await prisma.chefIngredient.findUnique({
+      where: { chefId_sourcePresetId: { chefId, sourcePresetId: preset.id } },
+    });
+    if (alreadyImported) continue; // skip — already in this chef's stock
+
+    const nameClash = await prisma.chefIngredient.findUnique({
+      where: { chefId_name: { chefId, name: preset.name } },
+    });
+    if (nameClash) continue; // a custom ingredient with the same name already exists — skip
+
+    const categoryId = await ensureChefCategoryForPreset(chefId, preset.categoryId);
+
+    const chefIngredient = await prisma.chefIngredient.create({
+      data: {
+        chefId,
+        name: preset.name,
+        categoryId,
+        purchasePrice: item.purchasePrice,
+        unitId: item.unitId,
+        source: 'PRESET',
+        sourcePresetId: preset.id,
+      },
+    });
+    created.push(chefIngredient);
+  }
+
+  return new ApiResponse(
+    201,
+    created,
+    `${created.length} ingredient(s) imported to your stock successfully`
+  ).send(res);
+});
+
+// US-11 Scenario 2: Create a brand-new custom ingredient (not copied from any preset)
+const createIngredient = asyncHandler(async (req, res) => {
+  const chefId = req.chef.id;
+  const { name, purchasePrice, unitId, categoryId } = req.body;
+
+  const existing = await prisma.chefIngredient.findUnique({ where: { chefId_name: { chefId, name } } });
+  if (existing) {
+    throw ApiError.conflict('You already have an ingredient with this name', {
+      code: 'INGREDIENT_EXISTS',
+    });
+  }
+
+  const unit = await prisma.chefUnit.findUnique({ where: { id: unitId } });
+  if (!unit || unit.chefId !== chefId) {
+    throw ApiError.badRequest('Unit not found in your list', [], { code: 'UNIT_NOT_IN_LIST' });
+  }
+
+  if (categoryId) {
+    const category = await prisma.chefCategory.findUnique({ where: { id: categoryId } });
+    if (!category || category.chefId !== chefId) {
+      throw ApiError.badRequest('Category not found in your list', [], { code: 'CATEGORY_NOT_IN_LIST' });
+    }
+  }
+
+  const chefIngredient = await prisma.chefIngredient.create({
+    data: { chefId, name, purchasePrice, unitId, categoryId, source: 'CUSTOM' },
+  });
+
+  return new ApiResponse(201, chefIngredient, 'Ingredient created successfully').send(res);
 });
 
 // US-34: Manage My Ingredient Inventory (list, filter by category)
@@ -71,47 +157,65 @@ const getMyIngredients = asyncHandler(async (req, res) => {
   const { categoryId } = req.query;
 
   const myIngredients = await prisma.chefIngredient.findMany({
-    where: {
-      chefId,
-      isActive: true,
-      ingredient: categoryId ? { categoryId } : undefined,
-    },
-    include: {
-      ingredient: { include: { category: true } },
-      unit: true,
-    },
-    orderBy: { ingredient: { name: 'asc' } },
+    where: { chefId, isActive: true, categoryId: categoryId || undefined },
+    include: { category: true, unit: true },
+    orderBy: { name: 'asc' },
   });
 
   const data = myIngredients.map((ci) => ({
-    chefIngredientId: ci.id,
-    ingredientId: ci.ingredient.id,
-    name: ci.ingredient.name,
-    category: ci.ingredient.category?.name || 'Uncategorized',
+    id: ci.id,
+    name: ci.name,
+    category: ci.category?.name || 'Uncategorized',
     purchasePrice: ci.purchasePrice,
     unit: { id: ci.unit.id, name: ci.unit.name, abbreviation: ci.unit.abbreviation },
+    source: ci.source,
   }));
 
   return new ApiResponse(200, data, 'My ingredient inventory fetched successfully').send(res);
 });
 
-// US-33: Update custom pricing/unit for a single stock item
+// US-33 + US-11 Scenario 3: Full edit (name/price/unit/category) — Copy-on-Write, never touches the preset
 const updateMyIngredient = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
-  const { ingredientId } = req.params;
-  const { purchasePrice, unitId } = req.body;
+  const { id } = req.params;
+  const { name, purchasePrice, unitId, categoryId } = req.body;
 
-  const existing = await prisma.chefIngredient.findUnique({
-    where: { chefId_ingredientId: { chefId, ingredientId } },
-  });
-  if (!existing) throw ApiError.notFound('This ingredient is not in your stock', { code: 'STOCK_INGREDIENT_NOT_FOUND' });
+  const existing = await prisma.chefIngredient.findUnique({ where: { id } });
+  if (!existing || existing.chefId !== chefId) {
+    throw ApiError.notFound('This ingredient is not in your stock', { code: 'STOCK_INGREDIENT_NOT_FOUND' });
+  }
+
+  if (name && name !== existing.name) {
+    const nameClash = await prisma.chefIngredient.findUnique({ where: { chefId_name: { chefId, name } } });
+    if (nameClash) {
+      throw ApiError.conflict('You already have an ingredient with this name', {
+        code: 'INGREDIENT_EXISTS',
+      });
+    }
+  }
+
+  if (unitId) {
+    const unit = await prisma.chefUnit.findUnique({ where: { id: unitId } });
+    if (!unit || unit.chefId !== chefId) {
+      throw ApiError.badRequest('Unit not found in your list', [], { code: 'UNIT_NOT_IN_LIST' });
+    }
+  }
+
+  if (categoryId) {
+    const category = await prisma.chefCategory.findUnique({ where: { id: categoryId } });
+    if (!category || category.chefId !== chefId) {
+      throw ApiError.badRequest('Category not found in your list', [], { code: 'CATEGORY_NOT_IN_LIST' });
+    }
+  }
 
   const updated = await prisma.chefIngredient.update({
-    where: { chefId_ingredientId: { chefId, ingredientId } },
-    data: { purchasePrice, unitId },
+    where: { id },
+    data: { name, purchasePrice, unitId, categoryId },
   });
 
-  await recalculateDishesUsingChefIngredient(existing.id); // US-42
+  if (purchasePrice !== undefined) {
+    await recalculateDishesUsingChefIngredient(existing.id); // US-42
+  }
 
   return new ApiResponse(200, updated, 'Ingredient stock updated successfully').send(res);
 });
@@ -119,17 +223,14 @@ const updateMyIngredient = asyncHandler(async (req, res) => {
 // US-35: Hide/Archive Ingredient via Uncheck (soft delete)
 const archiveMyIngredient = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
-  const { ingredientId } = req.params;
+  const { id } = req.params;
 
-  const existing = await prisma.chefIngredient.findUnique({
-    where: { chefId_ingredientId: { chefId, ingredientId } },
-  });
-  if (!existing) throw ApiError.notFound('This ingredient is not in your stock', { code: 'STOCK_INGREDIENT_NOT_FOUND' });
+  const existing = await prisma.chefIngredient.findUnique({ where: { id } });
+  if (!existing || existing.chefId !== chefId) {
+    throw ApiError.notFound('This ingredient is not in your stock', { code: 'STOCK_INGREDIENT_NOT_FOUND' });
+  }
 
-  const updated = await prisma.chefIngredient.update({
-    where: { chefId_ingredientId: { chefId, ingredientId } },
-    data: { isActive: false },
-  });
+  const updated = await prisma.chefIngredient.update({ where: { id }, data: { isActive: false } });
 
   return new ApiResponse(200, updated, 'Ingredient archived from your stock').send(res);
 });
@@ -137,16 +238,14 @@ const archiveMyIngredient = asyncHandler(async (req, res) => {
 // US-36: Permanently Delete Ingredient (Hard Delete) — guarded against dishes using it
 const deleteMyIngredient = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
-  const { ingredientId } = req.params;
+  const { id } = req.params;
 
-  const existing = await prisma.chefIngredient.findUnique({
-    where: { chefId_ingredientId: { chefId, ingredientId } },
-  });
-  if (!existing) throw ApiError.notFound('This ingredient is not in your stock', { code: 'STOCK_INGREDIENT_NOT_FOUND' });
+  const existing = await prisma.chefIngredient.findUnique({ where: { id } });
+  if (!existing || existing.chefId !== chefId) {
+    throw ApiError.notFound('This ingredient is not in your stock', { code: 'STOCK_INGREDIENT_NOT_FOUND' });
+  }
 
-  const usageCount = await prisma.dishIngredient.count({
-    where: { chefIngredientId: existing.id },
-  });
+  const usageCount = await prisma.dishIngredient.count({ where: { chefIngredientId: existing.id } });
   if (usageCount > 0) {
     throw ApiError.conflict(
       `Cannot delete: this ingredient is used in ${usageCount} dish(es). Archive it instead.`,
@@ -154,7 +253,7 @@ const deleteMyIngredient = asyncHandler(async (req, res) => {
     );
   }
 
-  await prisma.chefIngredient.delete({ where: { chefId_ingredientId: { chefId, ingredientId } } });
+  await prisma.chefIngredient.delete({ where: { id } });
 
   return new ApiResponse(200, null, 'Ingredient permanently deleted from your stock').send(res);
 });
@@ -162,6 +261,7 @@ const deleteMyIngredient = asyncHandler(async (req, res) => {
 module.exports = {
   getIngredientPresets,
   importIngredients,
+  createIngredient,
   getMyIngredients,
   updateMyIngredient,
   archiveMyIngredient,

@@ -1,3 +1,4 @@
+const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const prisma = require('../config/db');
 const ApiError = require('../utils/ApiError');
@@ -63,7 +64,7 @@ const exportExcelReport = asyncHandler(async (req, res) => {
     for (const di of dish.ingredients) {
       detailSheet.addRow({
         dish: dish.name,
-        ingredient: di.chefIngredient.ingredient.name,
+        ingredient: di.chefIngredient.name,
         quantity: di.quantityUsed * event.tableCount,
         unit: di.chefIngredient.unit.abbreviation,
         unitPrice: di.chefIngredient.purchasePrice,

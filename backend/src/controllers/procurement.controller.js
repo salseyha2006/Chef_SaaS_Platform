@@ -31,19 +31,22 @@ const getShoppingListWithStatus = asyncHandler(async (req, res) => {
 // US-60: Mark Items as Purchased (Check-off) — toggle single ingredient
 const togglePurchased = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
-  const { eventId, ingredientId } = req.params;
+  const { eventId, chefIngredientId } = req.params;
   const { isPurchased } = req.body;
 
   const event = await prisma.event.findUnique({ where: { id: eventId } });
   if (!event || event.chefId !== chefId) throw ApiError.notFound('Event not found', { code: 'EVENT_NOT_FOUND' });
 
-  const ingredient = await prisma.ingredient.findUnique({ where: { id: ingredientId } });
-  if (!ingredient) throw ApiError.notFound('Ingredient not found', { code: 'INGREDIENT_NOT_FOUND' });
+  // Ownership check — a chef must not be able to toggle another chef's ingredient by guessing its id
+  const chefIngredient = await prisma.chefIngredient.findUnique({ where: { id: chefIngredientId } });
+  if (!chefIngredient || chefIngredient.chefId !== chefId) {
+    throw ApiError.notFound('Ingredient not found', { code: 'INGREDIENT_NOT_FOUND' });
+  }
 
   const status = await prisma.eventPurchaseStatus.upsert({
-    where: { eventId_ingredientId: { eventId, ingredientId } },
+    where: { eventId_chefIngredientId: { eventId, chefIngredientId } },
     update: { isPurchased, purchasedAt: isPurchased ? new Date() : null },
-    create: { eventId, ingredientId, isPurchased, purchasedAt: isPurchased ? new Date() : null },
+    create: { eventId, chefIngredientId, isPurchased, purchasedAt: isPurchased ? new Date() : null },
   });
 
   return new ApiResponse(

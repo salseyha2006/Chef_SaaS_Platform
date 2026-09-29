@@ -5,13 +5,21 @@ async function getAllDishesInEvent(eventId) {
   const event = await prisma.event.findUnique({
     where: { id: eventId },
     include: {
-      dishes: { include: { dish: { include: { ingredients: { include: { chefIngredient: { include: { ingredient: true, unit: true } } } } } } } },
+      dishes: {
+        include: {
+          dish: { include: { ingredients: { include: { chefIngredient: { include: { unit: true } } } } } },
+        },
+      },
       menuSets: {
         include: {
           menuSet: {
             include: {
               dishes: {
-                include: { dish: { include: { ingredients: { include: { chefIngredient: { include: { ingredient: true, unit: true } } } } } } },
+                include: {
+                  dish: {
+                    include: { ingredients: { include: { chefIngredient: { include: { unit: true } } } } },
+                  },
+                },
               },
             },
           },
@@ -30,26 +38,26 @@ async function getAllDishesInEvent(eventId) {
   return { event, dishes };
 }
 
-// US-53: Build the aggregated shopping list, grouped by ingredient, scaled by tableCount
+// US-53: Build the aggregated shopping list, grouped by this chef's own ingredient, scaled by tableCount
 async function buildShoppingList(eventId) {
   const result = await getAllDishesInEvent(eventId);
   if (!result) return null;
   const { event, dishes } = result;
 
-  const grouped = {};
+  const grouped = {}; // key: ChefIngredient.id (unique per chef, so it's the correct grouping key now)
 
   for (const dish of dishes) {
     for (const di of dish.ingredients) {
-      const ing = di.chefIngredient.ingredient;
-      const unit = di.chefIngredient.unit;
-      const key = ing.id;
+      const chefIngredient = di.chefIngredient;
+      const unit = chefIngredient.unit;
+      const key = chefIngredient.id;
 
       if (!grouped[key]) {
         grouped[key] = {
-          ingredientId: ing.id,
-          ingredientName: ing.name,
+          chefIngredientId: chefIngredient.id,
+          ingredientName: chefIngredient.name,
           unit: { id: unit.id, name: unit.name, abbreviation: unit.abbreviation },
-          unitPrice: di.chefIngredient.purchasePrice,
+          unitPrice: chefIngredient.purchasePrice,
           quantityPerTable: 0,
         };
       }
@@ -77,11 +85,11 @@ async function buildShoppingListWithPurchaseStatus(eventId) {
   if (!result) return null;
 
   const statuses = await prisma.eventPurchaseStatus.findMany({ where: { eventId } });
-  const statusMap = new Map(statuses.map((s) => [s.ingredientId, s.isPurchased]));
+  const statusMap = new Map(statuses.map((s) => [s.chefIngredientId, s.isPurchased]));
 
   const items = result.items.map((item) => ({
     ...item,
-    isPurchased: statusMap.get(item.ingredientId) || false,
+    isPurchased: statusMap.get(item.chefIngredientId) || false,
   }));
 
   const purchasedCount = items.filter((i) => i.isPurchased).length;
