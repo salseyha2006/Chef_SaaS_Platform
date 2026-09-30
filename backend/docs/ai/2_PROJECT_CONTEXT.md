@@ -42,7 +42,7 @@
 | Security | `helmet ^7.1.0`, `cors`, `express-rate-limit ^7.4.0`, `cookie-parser` | |
 | Logging | `morgan` | ដំណើរការតែ `NODE_ENV === 'development'` |
 | Upload | `multer ^1.4.5-lts.1` (memoryStorage) + `cloudinary ^2.5.0` | ប្រើសម្រាប់ avatar |
-| Email | `nodemailer ^6.9.15` (SMTP) | OTP + Receipt, ភាសា km/en |
+| Email | `nodemailer ^6.9.15` (SMTP) | OTP + Receipt + Payment-failed notification, ភាសា km/en |
 | PDF | `pdfkit ^0.15.0` + `@fontsource/kantumruy-pro` | Font Khmer |
 | Excel | `exceljs ^4.4.0` | |
 | Scheduler | `node-cron ^3.0.3` | |
@@ -102,7 +102,7 @@ Controller ដែលគ្មាន route file ផ្ទាល់ខ្លួន
 - Service ប្រើសម្រាប់ logic ដែលចែករំលែក/ខាងក្រៅ:
   - `costing.service` — recalc `Dish.totalCost` / `MenuSet.totalCost` (cache field)
   - `shoppingList.service` — aggregate គ្រឿងផ្សំតាម `chefIngredientId` × `tableCount`, បូក purchase status
-  - `subscription.service` — `startTrialForChef` (14 ថ្ងៃ), `chargeSubscription`, `getSubscriptionEndDate`
+  - `subscription.service` — `startTrialForChef` (14 ថ្ងៃ, guard `trialUsed`), `chargeSubscription` (គាំទ្រ `savedPaymentMethodId` + idempotency key), `getSubscriptionEndDate`
   - `payment.service` — gateway abstraction (`PROVIDERS = { ABA_PAYWAY }`), `abaPayway.service` = mock
   - `email.service`, `pdf.service`, `upload.service` (Cloudinary, `chef-saas/avatars`)
 - Service ដែល throw `ApiError` ផ្ទាល់: `subscription.service`, `payment.service`
@@ -156,11 +156,22 @@ Controller ដែលគ្មាន route file ផ្ទាល់ខ្លួន
 ### 6.10 ឯកសារ (PDF / Excel / Avatar)
 - PDF purchasing list (`POST /events/:eventId/reports/pdf`): ឈ្មោះ + បរិមាណតែប៉ុណ្ណោះ (មិនបង្ហាញតម្លៃ), អាចផ្ញើ `items` override; ភាសាតាម `chef.language`
 - Excel (`GET …/reports/excel`): 2 sheets — `Dish Detail`, `Shopping List Summary` (មានតម្លៃពេញ)
-- Invoice PDF + Receipt email (PDF attach) ភាសា km/en
+- Invoice PDF + Receipt email (PDF attach) ភាសា km/en, generate on-demand ពី `Transaction` (មិនរក្សា File អចិន្ត្រៃយ៍)
 - Avatar: multer memory, ≤5MB, `jpeg|png|webp`, field `avatar`, Cloudinary 512×512 fill/face
 
 ### 6.11 Cron (`jobs/subscription.cron.js`)
-រាល់ថ្ងៃ `10 0 * * *`: រក subscription `endDate <= now` និង status ∈ {ACTIVE, TRIALING, PAST_DUE}; បើ `autoRenew` និងមិនមែន TRIALING → `chargeSubscription` (ជាប់ `ABA_PAYWAY`) → ជោគជ័យ `ACTIVE` + `endDate` ថ្មី, បរាជ័យ `PAST_DUE`; ផ្សេងពីនេះ → `EXPIRED` (មិនលុប data)។
+រត់រាល់ថ្ងៃ `10 0 * * *` (`processExpiredSubscriptions`): រក `Subscription` ដែល `endDate <= now` និង `status ∈ {ACTIVE, TRIALING, PAST_DUE}`។
+
+**Path A — Auto-renew ((`autoRenew === true` និង `status !== 'TRIALING'`))** ហៅ `handleAutoRenewal(sub)`:
+1. **Idempotency claim**: `updateMany({ where: { id, OR: [{renewalLockedAt: null}, {renewalLockedAt: {lt: staleThreshold(10 នាទី)}}] }, data: { renewalLockedAt: now } })`; បើ `count === 0` (process ផ្សេងកំពុងធ្វើរួច) → `return` ភ្លាម (skip)
+2. រក `SavedPaymentMethod` ដែល `isDefault: true` របស់ chef នោះ — **បើគ្មាន Default Card** → បរាជ័យភ្លាម (`failureReason: 'No saved payment method on file'`, គ្មាន `Transaction` row បង្កើត ព្រោះគ្មាន Payment Method ត្រូវសរសេរភ្ជាប់)
+3. **បើមាន Default Card**: ហៅ `chargeSubscription({ chef, plan, paymentMethod: defaultMethod.provider, savedPaymentMethodId: defaultMethod.id, subscriptionId, idempotencyKey: \`${sub.id}-${sub.endDate.toISOString()}\` })`
+4. **ជោគជ័យ**: `status: 'ACTIVE'`, `endDate` ថ្មី (`getSubscriptionEndDate`), **`retryCount: 0`** (reset), `renewalLockedAt: null` → ផ្ញើ Receipt Email (PDF ភ្ជាប់, fire-and-forget)
+5. **បរាជ័យ**: `newRetryCount = sub.retryCount + 1`; បើ `newRetryCount >= MAX_AUTO_RETRY_ATTEMPTS (3)` → `status: 'EXPIRED'` (Graceful Lockout); ផ្សេងទៀត → `status: 'PAST_DUE'`; ទាំងពីរករណី `retryCount: newRetryCount`, `renewalLockedAt: null` → ផ្ញើ Payment-Failed Notification Email (Retry ដង/Final Attempt តាម `isFinalAttempt`, fire-and-forget)
+
+**Path B — Trial ចប់ ឬ Chef បានបោះបង់ Auto-renew ( `!autoRenew || status === 'TRIALING'`)**: `status: 'EXPIRED'` ភ្លាមៗ (គ្មាន Retry, គ្មាន Claim, ព្រោះមិនមាន Charge ត្រូវព្យាយាម — data មិនត្រូវបានលុប)
+
+**MAX_AUTO_RETRY_ATTEMPTS = 3** (Constant ក្នុង File, មិនទាន់ជា Env Var — "Configurable" តាម Technical Note US-20 មានន័យត្រឹមតែផ្លាស់ប្តូរ Constant នេះក្នុង Code)។
 
 ### 6.12 Naming Conventions (ពី Code)
 - ឯកសារ: `<name>.controller.js`, `<name>.routes.js`, `<name>.service.js`, `<name>.validator.js`; ឈ្មោះ camelCase (`menuSet`, `vendorPreset`, `paymentMethod`)
@@ -175,14 +186,14 @@ Controller ដែលគ្មាន route file ផ្ទាល់ខ្លួន
 ## 7. Data Model សង្ខេប (`schema.prisma`)
 Enums: `AuthProvider`(LOCAL, GOOGLE), `SubscriptionStatus`(TRIALING, ACTIVE, PAST_DUE, CANCELED, EXPIRED), `TransactionStatus`(PENDING, SUCCESS, FAILED, REFUNDED), `PaymentMethod`(ABA_PAYWAY, VISA_MASTERCARD, WING), `RefundStatus`(REQUESTED, APPROVED, REJECTED), `PresetSource`(PRESET, CUSTOM)
 
-Models: `Chef`, `RefreshToken`, `Unit`, `Category`, `Ingredient` (global) · `ChefUnit`, `ChefCategory`, `ChefIngredient` (per-chef) · `Plan`, `Subscription` (1:1 Chef), `Transaction`, `BillingInfo`, `SavedPaymentMethod` · `Dish`, `DishIngredient`, `MenuSet`, `MenuSetDish` (`sortOrder`) · `Event`, `EventDish`, `EventMenuSet`, `VendorPreset`, `VendorPresetIngredient`, `EventPurchaseStatus`
+Models: `Chef` (`trialUsed`, `language`, `hasCompletedOnboarding`), `RefreshToken`, `Unit`, `Category`, `Ingredient` (global) · `ChefUnit`, `ChefCategory`, `ChefIngredient` (per-chef) · `Plan` (`isRecommended`), `Subscription` (1:1 Chef; `retryCount`, `renewalLockedAt`), `Transaction`, `BillingInfo`, `SavedPaymentMethod` · `Dish`, `DishIngredient`, `MenuSet`, `MenuSetDish` (`sortOrder`) · `Event`, `EventDish`, `EventMenuSet`, `VendorPreset`, `VendorPresetIngredient`, `EventPurchaseStatus`
 
 ## 8. Inconsistencies (Pattern មិនស៊ីគ្នា — ពិនិត្យតាម Code)
 
 ### A. Response / Error
 1. Endpoint ទាញឯកសារ (`GET /billing/transactions/:id/invoice`, report PDF/Excel) មិនប្រើ `ApiResponse`; `/health` ក៏សរសេរ `res.json` ផ្ទាល់ (រូបរាងដូចគ្នា ប៉ុន្តែមិនឆ្លងកាត់ `ApiResponse`)។
 2. `errors[]` មានរូបរាងខុសគ្នា: validation = `{field,message,code,params}`; `PAYMENT_FAILED` / `PAYMENT_RETRY_FAILED` = `[{ transactionId }]`; ករណីផ្សេងទទេ។
-3. Code ដដែល ប៉ុន្តែ HTTP status ខុស: `STOCK_INGREDIENT_NOT_FOUND` = **404** ក្នុង `ingredient.controller`, តែ = **400** ក្នុង `vendorPreset.controller`។ ក្រៅពីនេះ ករណី "រក ingredient មិនឃើញ" មាន 3 ឈ្មោះ: `STOCK_INGREDIENT_NOT_FOUND`, `INGREDIENT_NOT_FOUND` (procurement), `INGREDIENTS_NOT_FOUND` (import)។
+3. Code ដដែល ប៉ុន្តែ HTTP status ខុស: `STOCK_INGREDIENT_NOT_FOUND` = **404** ក្នុង `ingredient.controller`, តែ = **400** ក្នុង `vendorPreset.controller`។ `SUBSCRIPTION_NOT_FOUND` = **403** ពី `requireActiveSubscription` Middleware តែ = **404** ពី `GET /subscription/me` ផ្ទាល់។ ក្រៅពីនេះ ករណី "រក ingredient មិនឃើញ" មាន 3 ឈ្មោះ: `STOCK_INGREDIENT_NOT_FOUND`, `INGREDIENT_NOT_FOUND` (procurement), `INGREDIENTS_NOT_FOUND` (import)។
 4. ដែនកំណត់ចំនួនដង ប្រើ status ខុសគ្នា: `AUTH_OTP_RESEND_LIMITED` = 403 (per-account), `AUTH_RESEND_RATE_LIMITED` = 429 (per-IP); `AUTH_ACCOUNT_LOCKED` / `AUTH_TOO_MANY_ATTEMPTS` = 403។
 5. Error ដែលមិនមែន `ApiError` និងគ្មាន status ស្គាល់ ទទួល `code: 'ERROR'` (គ្មាន code ជាក់លាក់)។
 6. `validate()` ពិនិត្យ body តែមួយ — query (`archived`, `tag`, `upcoming`, `categoryId`) និង path param (`:id` …) មិនត្រូវបាន validate ដោយ Zod។
@@ -203,19 +214,19 @@ Models: `Chef`, `RefreshToken`, `Unit`, `Category`, `Ingredient` (global) · `Ch
 17. Semantics "Archive" ខុសគ្នា: Unit/Category/Ingredient ប្រើ `isActive` (list ត្រឹមតែ active, គ្មាន `?archived`); Dish/MenuSet ប្រើ `isArchived` (មាន `?archived=true`)។ `Event` គ្មាន archive/delete; Unit/Category គ្មាន hard delete។
 18. `PATCH /vendor-presets/:id` គ្មាន `validate()` (route ផ្សេងដែលមាន body ទាំងអស់មាន)។
 19. ឈ្មោះ file middleware លាយ: `auth.middleware.js` (មាន suffix) vs `errorHandler.js`, `rateLimiters.js`, `requireActiveSubscription.js` (គ្មាន suffix)។
-20. Validator ចងក្រុមមិនតាម entity: `catalog.validator` = unit+category+ingredient; `event.validator` រួមទាំង `vendorPresetSchema` និង report schema; `billing.validator` រួមទាំង subscription upgrade/retry។
+20. Validator ចងក្រុមមិនតាម entity: `catalog.validator` = unit+category+ingredient; `event.validator` រួមទាំង `vendorPresetSchema` និង report schema; `billing.validator` រួមទាំង subscription upgrade/retry/saved-payment-method។
 
 ### D. Architecture
 21. Controller ហៅ Prisma ផ្ទាល់ភាគច្រើន; Service មានតែ logic ចែករំលែក — Layer "Controller/Service" ប្រើមិនស្មើគ្នា។
-22. `sendReceiptEmailInBackground` ចម្លងដូចគ្នាក្នុង `subscription.controller.js` និង `payment.controller.js`; ការគណនា `endDate` ក្នុង `retryPayment` សរសេរដោយដៃ ខណៈ `getSubscriptionEndDate` មាននៅក្នុង service។
+22. `sendReceiptEmailInBackground` ចម្លងដូចគ្នា ៣ កន្លែង (`subscription.controller.js`, `payment.controller.js`, `subscription.cron.js` ជា `sendReceiptEmailSafely`); ការគណនា `endDate` ក្នុង `retryPayment` សរសេរដោយដៃ ខណៈ `getSubscriptionEndDate` មាននៅក្នុង service។
 23. `PrismaClient` ពីរ instance: `config/db.js` (singleton ប្រើដោយ controller/service) និង `new PrismaClient()` ក្នុង `server.js`។
-24. `$transaction` ប្រើតែក្នុង `startTrialForChef` និង `paymentMethod.controller`; ការសរសេរច្រើនជំហានផ្សេងៗ (createDish, updateDish, create/updateMenuSet, updateVendorPreset, importIngredients …) មិនស្ថិតក្នុង transaction។ `upsertDishIngredients` ជា delete+create មិនមែន upsert។
+24. `$transaction` ប្រើក្នុង `startTrialForChef`, `paymentMethod.controller`, cron មិនប្រើ `$transaction` ពេលកែ `Subscription` (claim → charge → update ជា Query ដាច់ដោយឡែក ការពារដោយ `renewalLockedAt` ជំនួសវិញ); ការសរសេរច្រើនជំហានផ្សេងៗ (createDish, updateDish, create/updateMenuSet, updateVendorPreset, importIngredients …) មិនស្ថិតក្នុង transaction។ `upsertDishIngredients` ជា delete+create មិនមែន upsert។
 25. Response data: ខ្លះជា raw Prisma object (`createDish`, `createUnit` …), ខ្លះជា DTO រៀបចំ (`getDishDetail`, `getMyIngredients` ដែល `category` ជា string ខណៈ `createIngredient` ត្រឡប់ `categoryId`)។
-26. Dead code: `verifyTransaction` (abaPayway) មិនត្រូវបានហៅ; `require('pdfkit')` មិនប្រើក្នុង `report.controller.js`; comment ស្ទួនក្នុង `upgradeSubscription`។
+26. Dead code: `verifyTransaction` (abaPayway) មិនត្រូវបានហៅ; `require('pdfkit')` មិនប្រើក្នុង `report.controller.js`។
 
 ### E. Schema ↔ Code
-27. តម្លៃ/field ក្នុង schema ដែល Code មិនប្រើ: `SubscriptionStatus.CANCELED`, `TransactionStatus.PENDING/REFUNDED`, `RefundStatus.APPROVED/REJECTED`, `Subscription.renewalLockedAt`, `Plan.features`; `Subscription.retryCount` ត្រូវបាន reset ជា 0 ប៉ុន្តែមិនដែលបូក។
-28. `PaymentMethod` enum + validator អនុញ្ញាត `VISA_MASTERCARD`, `WING` ប៉ុន្តែ `payment.service` គាំទ្រតែ `ABA_PAYWAY` (ផ្សេងទៀត → 400 `PAYMENT_METHOD_UNSUPPORTED`); cron ចាក់ជាប់ `ABA_PAYWAY` ហើយមិនប្រើ saved method។
+27. តម្លៃ/field ក្នុង schema ដែល Code មិនប្រើ (ឬប្រើដោយផ្នែក): `SubscriptionStatus.CANCELED` (Code ប្រើ `autoRenew:false` លើ `status` ដែលមានស្រាប់ជំនួស ដោយមិនដែលកំណត់ `CANCELED` ផ្ទាល់), `TransactionStatus.PENDING/REFUNDED`, `RefundStatus.APPROVED/REJECTED` (គ្មាន Admin Endpoint អនុម័ត), `Plan.features` (Json field រក្សា ប៉ុន្តែគ្មាន Logic អាន)។ **`Subscription.retryCount` ត្រូវបានបូក និង Reset ជាក់ស្តែងក្នុង Cron** (មិនមែនមិនដែលបូកទេ); `renewalLockedAt` ត្រូវបានប្រើជា Idempotency Claim ក្នុង Cron។
+28. `PaymentMethod` enum + validator អនុញ្ញាត `VISA_MASTERCARD`, `WING` ប៉ុន្តែ `payment.service` គាំទ្រតែ `ABA_PAYWAY` (ផ្សេងទៀត → 400 `PAYMENT_METHOD_UNSUPPORTED`)។ **Cron ប្រើ `SavedPaymentMethod` ដែល `isDefault:true` របស់ Chef សម្រាប់ Auto-charge** (មិនចាក់ជាប់ `ABA_PAYWAY` ដោយគ្មាន Token ទេ) — បើ Chef គ្មាន Default Card, Cron ចាត់ទុកថាបរាជ័យភ្លាមដោយមិនហៅ Gateway។
 29. `deleteDish` ពិនិត្យតែ `MenuSetDish`; `deleteMenuSet` មិនពិនិត្យ `EventMenuSet`; `deleteMyIngredient` ពិនិត្យតែ `DishIngredient`។ Relation `EventDish→Dish`, `EventMenuSet→MenuSet`, `VendorPresetIngredient`/`EventPurchaseStatus→ChefIngredient` គ្មាន `onDelete` (Prisma default = Restrict) → ករណីទាំងនេះនឹងធ្លាក់ទៅ `P2003` → 400 `INVALID_REFERENCE`។
 
 ### F. README ↔ Code
@@ -224,12 +235,13 @@ Models: `Chef`, `RefreshToken`, `Unit`, `Category`, `Ingredient` (global) · `Ch
 32. README: "i18n handled entirely on Frontend" — Backend ក៏បកប្រែ email និង PDF (km/en) តាម `chef.language`។
 33. README: "`requireActiveSubscription` available to protect premium routes" — ជាក់ស្តែងត្រូវបានប្រើលើ write route ស្ទើរទាំងអស់។
 34. README: រូបភាព Dish ផ្ញើជា URL ពី Cloudinary (Frontend upload) — ប៉ុន្តែ avatar upload តាម Backend (`POST /auth/avatar`)។
-35. README មិនរាយ `/subscription/resume`, `/billing/payment-methods*`, `rateLimiters.js`, `upload.js`, `otpHash.js`, `payment.service.js`, `pdf.service.js`, `upload.service.js`, `cloudinary.js`; រាប់ controller 15 (ជាក់ស្តែង 16)។
+35. README មិនរាយ `/subscription/resume`, `/billing/payment-methods*`, `rateLimiters.js`, `upload.js`, `otpHash.js`, `payment.service.js`, `pdf.service.js`, `upload.service.js`, `cloudinary.js`; រាប់ controller 15 (ជាក់ស្តែង 16)។ README ក៏មិនទាន់ឆ្លុះបញ្ចាំង Retry/Idempotency Logic ថ្មីក្នុង Cron ពី Epic 5 ដែរ។
 
 ## 9. Missing / Not Provided (មិនមានក្នុង zip — មិនសន្មត់)
 - `prisma/migrations/` (README បញ្ជាឲ្យ `migrate dev --name init`)
 - API docs ក្នុង README ("Endpoint-by-endpoint documentation … per Epic 2–12") និងឯកសារ User Story / Epic (US-01…US-60) ដែល comment យោង
 - `package-lock.json` / lockfile, `.env` (ធម្មតា), tests, ESLint/Prettier config, Dockerfile/CI
 - Plan seeding: `seed.js` មិនបង្កើត `Plan` ជាប់បង់ប្រាក់ (មានតែ `startTrialForChef` បង្កើត plan `trial` ស្វ័យប្រវត្តិ) និងគ្មាន admin endpoint សម្រាប់ Plan/Refund approval
-- Payment webhook endpoint; pagination លើ list endpoint; `app.set('trust proxy')` (មិនមានក្នុង app.js)
+- Payment webhook endpoint (កត់ Comment ក្នុង `subscription.service.js` ថាជា Known Deviation — ត្រូវធ្វើពេលមាន ABA PayWay Credential ពិត); pagination លើ list endpoint; `app.set('trust proxy')` (មិនមានក្នុង app.js)
+- `MAX_AUTO_RETRY_ATTEMPTS` (Cron retry limit) ជា Hardcoded Constant មិនទាន់ជា Env Var/DB Config
 - Frontend code
