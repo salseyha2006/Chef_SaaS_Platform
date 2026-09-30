@@ -5,10 +5,7 @@ const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT) || 587,
   secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
+  auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
 });
 
 const DEFAULT_LANGUAGE = 'km';
@@ -35,6 +32,7 @@ const RECEIPT_TEMPLATES = {
     subject: 'បង្កាន់ដៃទូទាត់ប្រាក់ - Chef SaaS',
     heading: 'អរគុណសម្រាប់ការទូទាត់ប្រាក់!',
     intro: 'យើងខ្ញុំបានទទួលការទូទាត់ប្រាក់របស់អ្នករួចរាល់។ ព័ត៌មានលម្អិតមានភ្ជាប់ជា PDF ជាមួយអ៊ីមែលនេះ។',
+    dateLabel: 'កាលបរិច្ឆេទ',
     planLabel: 'កញ្ចប់សេវា',
     amountLabel: 'ចំនួនទឹកប្រាក់',
     invoiceLabel: 'លេខវិក្កយបត្រ',
@@ -43,9 +41,33 @@ const RECEIPT_TEMPLATES = {
     subject: 'Payment Receipt - Chef SaaS',
     heading: 'Thank you for your payment!',
     intro: 'We have received your payment. Full details are attached as a PDF invoice.',
+    dateLabel: 'Date',
     planLabel: 'Plan',
     amountLabel: 'Amount',
     invoiceLabel: 'Invoice number',
+  },
+};
+
+const PAYMENT_FAILED_TEMPLATES = {
+  km: {
+    subject: 'ការទូទាត់ប្រាក់បរាជ័យ - Chef SaaS',
+    heading: 'ការទូទាត់ប្រាក់មិនជោគជ័យ',
+    planLabel: 'កញ្ចប់សេវា',
+    reasonLabel: 'មូលហេតុ',
+    retrying: (n, max) =>
+      `ប្រព័ន្ធនឹងព្យាយាមកាត់ប្រាក់ម្តងទៀតដោយស្វ័យប្រវត្តិ (លើកទី ${n} ក្នុងចំណោម ${max})។ សូមធ្វើបច្ចុប្បន្នភាពមធ្យោបាយបង់ប្រាក់ ដើម្បីជៀសវាងការរអាក់រអួល។`,
+    final:
+      'ការទូទាត់បានបរាជ័យលើសចំនួនដងព្យាយាមកំណត់។ មុខងារកម្រិតខ្ពស់ត្រូវបានផ្អាកបណ្តោះអាសន្ន ប៉ុន្តែទិន្នន័យទាំងអស់របស់អ្នកនៅតែសុវត្ថិភាពពេញលេញ។ សូម Subscribe ម្តងទៀតនៅពេលណាដែលអ្នកចង់បន្ត។',
+  },
+  en: {
+    subject: 'Payment Failed - Chef SaaS',
+    heading: 'Your payment did not go through',
+    planLabel: 'Plan',
+    reasonLabel: 'Reason',
+    retrying: (n, max) =>
+      `We'll automatically try again (attempt ${n} of ${max}). Please update your payment method to avoid any interruption.`,
+    final:
+      'Payment failed after the maximum number of attempts. Advanced features have been paused, but none of your data was deleted. You can subscribe again anytime to pick up right where you left off.',
   },
 };
 
@@ -57,9 +79,6 @@ function baseWrapper(lang, innerHtml) {
   `;
 }
 
-/**
- * @param {'km' | 'en'} language  chef's saved language; falls back to Khmer
- */
 async function sendOtpEmail(toEmail, otp, purpose = 'verification', language = DEFAULT_LANGUAGE) {
   const lang = OTP_TEMPLATES[language] ? language : DEFAULT_LANGUAGE;
   const t = OTP_TEMPLATES[lang];
@@ -79,7 +98,7 @@ async function sendOtpEmail(toEmail, otp, purpose = 'verification', language = D
   await transporter.sendMail({ from: process.env.EMAIL_FROM, to: toEmail, subject, html });
 }
 
-// US-14 Scenario 1: send a payment receipt with the invoice PDF attached
+// US-14/US-21 Scenario 2: send a payment receipt with the invoice PDF attached
 async function sendReceiptEmail({ toEmail, transaction, language = DEFAULT_LANGUAGE, pdfBuffer }) {
   const lang = RECEIPT_TEMPLATES[language] ? language : DEFAULT_LANGUAGE;
   const t = RECEIPT_TEMPLATES[lang];
@@ -89,6 +108,7 @@ async function sendReceiptEmail({ toEmail, transaction, language = DEFAULT_LANGU
     `
       <h2>${t.heading}</h2>
       <p>${t.intro}</p>
+      <p><strong>${t.dateLabel}:</strong> ${new Date(transaction.createdAt).toISOString().slice(0, 10)}</p>
       <p><strong>${t.planLabel}:</strong> ${transaction.plan?.name || '-'}</p>
       <p><strong>${t.amountLabel}:</strong> $${transaction.amount.toFixed(2)} ${transaction.currency}</p>
       <p><strong>${t.invoiceLabel}:</strong> ${transaction.invoiceNumber}</p>
@@ -104,4 +124,30 @@ async function sendReceiptEmail({ toEmail, transaction, language = DEFAULT_LANGU
   });
 }
 
-module.exports = { sendOtpEmail, sendReceiptEmail };
+// US-19 Scenario 2 + US-20 Technical Note: notify on every failed auto-charge attempt
+async function sendPaymentFailedEmail({
+  toEmail,
+  language = DEFAULT_LANGUAGE,
+  planName,
+  reason,
+  retryCount,
+  maxAttempts,
+  isFinalAttempt,
+}) {
+  const lang = PAYMENT_FAILED_TEMPLATES[language] ? language : DEFAULT_LANGUAGE;
+  const t = PAYMENT_FAILED_TEMPLATES[lang];
+
+  const html = baseWrapper(
+    lang,
+    `
+      <h2>${t.heading}</h2>
+      <p><strong>${t.planLabel}:</strong> ${planName}</p>
+      <p><strong>${t.reasonLabel}:</strong> ${reason}</p>
+      <p>${isFinalAttempt ? t.final : t.retrying(retryCount, maxAttempts)}</p>
+    `
+  );
+
+  await transporter.sendMail({ from: process.env.EMAIL_FROM, to: toEmail, subject: t.subject, html });
+}
+
+module.exports = { sendOtpEmail, sendReceiptEmail, sendPaymentFailedEmail };
