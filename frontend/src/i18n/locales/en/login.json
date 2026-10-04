@@ -1,0 +1,23 @@
+{
+  "title": "Sign in",
+  "subtitle": "Welcome back! Sign in to manage your kitchen",
+  "verified": "Email verified! Sign in to continue",
+  "passwordReset": "Password updated! Sign in with your new password",
+  "email": "Email",
+  "emailPlaceholder": "you@example.com",
+  "password": "Password",
+  "passwordPlaceholder": "Enter your password",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "forgot": "Forgot password?",
+  "submit": "Sign in",
+  "or": "or",
+  "google": "Continue with Google",
+  "noAccount": "Don't have an account? Register",
+  "lockedWait": "Please wait {{time}} before trying again",
+  "validation": {
+    "emailRequired": "Please enter your email",
+    "emailInvalid": "Invalid email format",
+    "passwordRequired": "Please enter your password"
+  }
+}

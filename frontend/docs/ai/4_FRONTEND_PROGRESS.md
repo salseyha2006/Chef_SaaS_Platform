@@ -1,23 +1,21 @@
-# FRONTEND_PROGRESS.md
-ស្ថានភាព: ❌ មិនទាន់ | 🟡 កំពុងធ្វើ (mock) | ✅ ភ្ជាប់ API ពិត | ❓ មិនទាន់ពិនិត្យ
+## Epic 2 — Authentication & Profile
+- ✅ 2A Login/Google/Logout (Test ជាប់ + UI Professional SaaS)
+- 🟡 2B (ធ្វើរួច ⏳ រង់ចាំ Test)
+  - ✅ US-02 Register (inline validation, Strength indicator, Terms checkbox, Google)
+  - ✅ US-04 Verify OTP (6 ប្រអប់, paste/autofill, shake error, Resend 60s + limit)
+  - ✅ Components: AuthLayout, OTPInput, PasswordStrength, Checkbox
+- ⬜ 2C US-06 Forgot/Reset (ប្រើ AuthLayout + OTPInput ឡើងវិញ)
+- ⬜ 2D US-07 Profile/Avatar, US-08 Change/Set Password (+ Sync ភាសាទៅ Profile)
 
-| លំដាប់ | Epic | Page | Endpoint (Contract §) | FE |
-|---|---|---|---|---|
-| 0 | Foundation | api.js (token/refresh/error/blob) | §0, §2 | ❓ |
-| 1 | Auth | Register/Verify/Login/Forgot/Profile | §2 | ❓ |
-| 2 | Onboarding + Subscription | Onboarding, Plans, Upgrade | §3, §4 | ❓ |
-| 3 | Units / Categories | Manage pages | §6, §7 | ❓ |
-| 4 | Ingredients | Stock, Add, Import presets | §8 | ❓ |
-| 5 | Dishes | Catalog, Add/Edit, Detail | §9 | ❓ |
-| 6 | Menu Sets | List, Detail, Create | §10 | ❓ |
-| 7 | Events | List, Create, Detail | §11 | ❓ |
-| 8 | Cost/Shopping/Reports | Cost calc, Shopping list, PDF/Excel | §11, §12 | ❓ |
-| 9 | Vendor Presets | Manage | §13 | ❓ |
-| 10 | Dashboard | Home | §14 | ❓ |
-| 11 | Billing | Transactions, Invoice, Payment methods | §5 | ❓ |
+### Mock (2B)
+- Register: demo@chef.com / unverified@chef.com → "អ៊ីមែលត្រូវបានប្រើរួច"
+- OTP: 123456 = ត្រឹមត្រូវ · 000000 = ផុតកំណត់ · ផ្សេងទៀត = ខុស
+- Resend: 3 ដង → បន្ទាប់ទៀត Limited 10 នាទី
 
-## Backend Gap ដែលបានរកឃើញ
-(គ្មាន)
+## Backend Gaps (បន្ថែម)
+9. `/auth/verify-email` ឆ្លើយ `null` គ្មាន Token → ក្រោយ Verify ត្រូវ Login ម្តងទៀត (UX Spec ចង់ auto → Onboarding)
+10. គ្មានទំព័រ/Endpoint "លក្ខខណ្ឌប្រើប្រាស់" (Terms) → ទុកជា Text ជាប់
+11. `/auth/register` មិនប្រាប់រយៈពេលផុតកំណត់ OTP → Frontend មិនអាចបង្ហាញ Timer ផុតកំណត់ (មានតែ Resend cooldown)
 
-## Handoff ចុងក្រោយ
-(ឯកសារក្នុង HANDOFFS/)
+## Decisions
+- Gap #8: Frontend ហៅ `/auth/me` ក្នុង Epic 3 (មិនចាំបាច់ប៉ះ Backend)

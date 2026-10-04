@@ -1,0 +1,5 @@
+{
+  "language": { "label": "Language", "km": "ខ្មែរ", "en": "English" },
+  "actions": { "save": "Save", "cancel": "Cancel", "confirm": "Confirm", "retry": "Try again" },
+  "loading": "Loading..."
+}

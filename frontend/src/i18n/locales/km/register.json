@@ -1,0 +1,30 @@
+{
+  "title": "បង្កើតគណនី",
+  "subtitle": "ចាប់ផ្តើមគ្រប់គ្រងគ្រឿងផ្សំ និងថ្លៃដើមម្ហូបរបស់អ្នក",
+  "back": "ត្រឡប់ទៅទំព័រចូល",
+  "displayName": "ឈ្មោះ",
+  "displayNamePlaceholder": "ឈ្មោះរបស់អ្នក",
+  "email": "អ៊ីមែល",
+  "emailPlaceholder": "you@example.com",
+  "password": "លេខសម្ងាត់",
+  "passwordPlaceholder": "យ៉ាងតិច 8 តួអក្សរ",
+  "confirmPassword": "បញ្ជាក់លេខសម្ងាត់",
+  "confirmPlaceholder": "វាយលេខសម្ងាត់ម្តងទៀត",
+  "termsPrefix": "ខ្ញុំយល់ព្រមតាម",
+  "termsLink": "លក្ខខណ្ឌប្រើប្រាស់",
+  "submit": "ចុះឈ្មោះ",
+  "or": "ឬ",
+  "google": "ចុះឈ្មោះតាម Google",
+  "haveAccount": "មានគណនីរួចហើយ? ចូលប្រើប្រាស់",
+  "strength": { "weak": "ខ្សោយ", "medium": "មធ្យម", "strong": "ខ្លាំង" },
+  "validation": {
+    "nameRequired": "សូមបញ្ចូលឈ្មោះ",
+    "nameShort": "ឈ្មោះត្រូវមានយ៉ាងតិច 2 តួអក្សរ",
+    "emailRequired": "សូមបញ្ចូលអ៊ីមែល",
+    "emailInvalid": "ទម្រង់អ៊ីមែលមិនត្រឹមត្រូវ",
+    "passwordRequired": "សូមបញ្ចូលលេខសម្ងាត់",
+    "passwordShort": "លេខសម្ងាត់ត្រូវមានយ៉ាងតិច 8 តួអក្សរ",
+    "confirmRequired": "សូមបញ្ជាក់លេខសម្ងាត់",
+    "passwordMismatch": "លេខសម្ងាត់មិនត្រូវគ្នា"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "forgot": {
+    "title": "ភ្លេចលេខសម្ងាត់",
+    "subtitle": "បញ្ចូលអ៊ីមែលរបស់អ្នក យើងនឹងផ្ញើកូដ OTP សម្រាប់កំណត់លេខសម្ងាត់ថ្មី",
+    "back": "ត្រឡប់ទៅទំព័រចូល",
+    "email": "អ៊ីមែល",
+    "emailPlaceholder": "you@example.com",
+    "submit": "ផ្ញើកូដ OTP",
+    "backToLogin": "ត្រឡប់ទៅចូលប្រើប្រាស់",
+    "validation": {
+      "emailRequired": "សូមបញ្ចូលអ៊ីមែល",
+      "emailInvalid": "ទម្រង់អ៊ីមែលមិនត្រឹមត្រូវ"
+    }
+  },
+  "reset": {
+    "title": "កំណត់លេខសម្ងាត់ថ្មី",
+    "generic": "ប្រសិនបើអ៊ីមែល {{email}} មានក្នុងប្រព័ន្ធ លេខកូដនឹងត្រូវផ្ញើទៅ",
+    "back": "ប្តូរអ៊ីមែល",
+    "otpLabel": "កូដ OTP",
+    "newPassword": "លេខសម្ងាត់ថ្មី",
+    "newPasswordPlaceholder": "យ៉ាងតិច 8 តួអក្សរ",
+    "confirmPassword": "បញ្ជាក់លេខសម្ងាត់ថ្មី",
+    "confirmPlaceholder": "វាយលេខសម្ងាត់ម្តងទៀត",
+    "submit": "កំណត់លេខសម្ងាត់ថ្មី",
+    "noCode": "មិនទទួលបានកូដ?",
+    "resend": "ផ្ញើម្តងទៀត",
+    "resendIn": "ផ្ញើម្តងទៀតក្នុង {{time}}",
+    "resent": "បានផ្ញើកូដថ្មីរួចរាល់ សូមពិនិត្យអ៊ីមែល",
+    "validation": {
+      "otpIncomplete": "សូមបញ្ចូលកូដ 6 ខ្ទង់",
+      "passwordRequired": "សូមបញ្ចូលលេខសម្ងាត់ថ្មី",
+      "passwordShort": "លេខសម្ងាត់ត្រូវមានយ៉ាងតិច 8 តួអក្សរ",
+      "confirmRequired": "សូមបញ្ជាក់លេខសម្ងាត់ថ្មី",
+      "passwordMismatch": "លេខសម្ងាត់មិនត្រូវគ្នា"
+    }
+  }
+}

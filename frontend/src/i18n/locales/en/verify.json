@@ -1,0 +1,13 @@
+{
+  "title": "Verify your email",
+  "back": "Back",
+  "sentTo": "We sent a 6-digit code to",
+  "otpLabel": "Verification code",
+  "noCode": "Didn't get the code?",
+  "resend": "Resend",
+  "resendIn": "Resend in {{time}}",
+  "resent": "A new code was sent. Check your email",
+  "submit": "Confirm",
+  "success": "Verified!",
+  "successHint": "Taking you to sign in..."
+}

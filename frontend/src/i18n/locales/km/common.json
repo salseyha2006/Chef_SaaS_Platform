@@ -1,0 +1,5 @@
+{
+  "language": { "label": "ភាសា", "km": "ខ្មែរ", "en": "English" },
+  "actions": { "save": "រក្សាទុក", "cancel": "បោះបង់", "confirm": "បញ្ជាក់", "retry": "ព្យាយាមម្តងទៀត" },
+  "loading": "កំពុងដំណើរការ..."
+}
