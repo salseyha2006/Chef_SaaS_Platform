@@ -71,6 +71,27 @@ const PAYMENT_FAILED_TEMPLATES = {
   },
 };
 
+const REFUND_TEMPLATES = {
+  km: {
+    approvedSubject: 'សំណើសុំប្រាក់មកវិញត្រូវបានអនុម័ត - Chef SaaS',
+    approvedHeading: 'ប្រាក់របស់អ្នកត្រូវបានសងមកវិញ',
+    rejectedSubject: 'សំណើសុំប្រាក់មកវិញត្រូវបានបដិសេធ - Chef SaaS',
+    rejectedHeading: 'សំណើសុំប្រាក់មកវិញមិនត្រូវបានអនុម័ត',
+    amountLabel: 'ចំនួនទឹកប្រាក់',
+    invoiceLabel: 'លេខវិក្កយបត្រ',
+    reasonLabel: 'មូលហេតុ',
+  },
+  en: {
+    approvedSubject: 'Your Refund Has Been Approved - Chef SaaS',
+    approvedHeading: 'Your refund has been processed',
+    rejectedSubject: 'Your Refund Request Was Rejected - Chef SaaS',
+    rejectedHeading: 'Your refund request was not approved',
+    amountLabel: 'Amount',
+    invoiceLabel: 'Invoice number',
+    reasonLabel: 'Reason',
+  },
+};
+
 function baseWrapper(lang, innerHtml) {
   return `
     <div lang="${lang}" style="font-family: 'Noto Sans Khmer', 'Khmer OS', 'Khmer UI', Arial, sans-serif; padding: 16px; max-width: 480px;">
@@ -150,4 +171,44 @@ async function sendPaymentFailedEmail({
   await transporter.sendMail({ from: process.env.EMAIL_FROM, to: toEmail, subject: t.subject, html });
 }
 
-module.exports = { sendOtpEmail, sendReceiptEmail, sendPaymentFailedEmail };
+// US-25 Scenario 3: notify the chef once an admin approves their refund
+async function sendRefundApprovedEmail({ toEmail, language = DEFAULT_LANGUAGE, transaction }) {
+  const lang = REFUND_TEMPLATES[language] ? language : DEFAULT_LANGUAGE;
+  const t = REFUND_TEMPLATES[lang];
+
+  const html = baseWrapper(
+    lang,
+    `
+      <h2>${t.approvedHeading}</h2>
+      <p><strong>${t.amountLabel}:</strong> $${transaction.amount.toFixed(2)} ${transaction.currency}</p>
+      <p><strong>${t.invoiceLabel}:</strong> ${transaction.invoiceNumber}</p>
+    `
+  );
+
+  await transporter.sendMail({ from: process.env.EMAIL_FROM, to: toEmail, subject: t.approvedSubject, html });
+}
+
+// US-25 Scenario 4: notify the chef with the admin's reason when a refund is rejected
+async function sendRefundRejectedEmail({ toEmail, language = DEFAULT_LANGUAGE, transaction, reason }) {
+  const lang = REFUND_TEMPLATES[language] ? language : DEFAULT_LANGUAGE;
+  const t = REFUND_TEMPLATES[lang];
+
+  const html = baseWrapper(
+    lang,
+    `
+      <h2>${t.rejectedHeading}</h2>
+      <p><strong>${t.invoiceLabel}:</strong> ${transaction.invoiceNumber}</p>
+      <p><strong>${t.reasonLabel}:</strong> ${reason}</p>
+    `
+  );
+
+  await transporter.sendMail({ from: process.env.EMAIL_FROM, to: toEmail, subject: t.rejectedSubject, html });
+}
+
+module.exports = {
+  sendOtpEmail,
+  sendReceiptEmail,
+  sendPaymentFailedEmail,
+  sendRefundApprovedEmail,
+  sendRefundRejectedEmail,
+};

@@ -309,6 +309,12 @@ model Transaction {
 
   refundStatus    RefundStatus?
   refundReason    String?
+  refundReviewedBy  String?   // admin identifier (stub — no full admin user model yet)
+  refundReviewedAt  DateTime?
+
+  // US-24 Scenario 2: captured at charge time so old invoices never change if BillingInfo is edited later
+  billingNameSnapshot String?
+  shopAddressSnapshot String?
 
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt

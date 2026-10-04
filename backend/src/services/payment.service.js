@@ -24,4 +24,16 @@ async function charge(paymentMethod, params) {
   return provider.charge(params);
 }
 
-module.exports = { charge, getProvider };
+async function refund(paymentMethod, params) {
+  const provider = getProvider(paymentMethod);
+  if (!provider.refund) {
+    throw ApiError.badRequest(
+      `Refunds are not supported for ${paymentMethod}`,
+      [],
+      { code: 'REFUND_METHOD_UNSUPPORTED', params: { method: paymentMethod } }
+    );
+  }
+  return provider.refund(params);
+}
+
+module.exports = { charge, refund, getProvider };

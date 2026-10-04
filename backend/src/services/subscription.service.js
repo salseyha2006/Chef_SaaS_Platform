@@ -35,6 +35,8 @@ async function startTrialForChef(chefId) {
 
 // US-19 / US-20: Attempt to charge a chef for a given plan and record the transaction.
 // Optionally charges a previously saved card (US-18 Scenario 2) instead of a fresh one.
+// US-19 / US-20: Attempt to charge a chef for a given plan and record the transaction.
+// Optionally charges a previously saved card (US-18 Scenario 2) instead of a fresh one.
 async function chargeSubscription({
   chef,
   plan,
@@ -77,6 +79,10 @@ async function chargeSubscription({
 
   const invoiceNumber = `INV-${Date.now()}`;
 
+  // US-24 Scenario 2: snapshot billing info at charge time so future edits never retroactively
+  // change an already-issued invoice.
+  const billingInfo = await prisma.billingInfo.findUnique({ where: { chefId: chef.id } });
+
   const transaction = await prisma.transaction.create({
     data: {
       chefId: chef.id,
@@ -88,6 +94,8 @@ async function chargeSubscription({
       gatewayRef: chargeResult.gatewayRef,
       failureReason: chargeResult.failureReason,
       invoiceNumber,
+      billingNameSnapshot: billingInfo?.billingName || null,
+      shopAddressSnapshot: billingInfo?.shopAddress || null,
     },
   });
 

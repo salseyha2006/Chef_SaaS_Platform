@@ -19,6 +19,7 @@ const LABELS = {
     invoice: 'វិក្កយបត្រ',
     date: 'កាលបរិច្ឆេទ',
     billedTo: 'ចេញជូន',
+    addressLabel: 'អាសយដ្ឋានហាង',
     plan: 'កញ្ចប់សេវា',
     amount: 'ចំនួនទឹកប្រាក់',
     paymentMethod: 'វិធីបង់ប្រាក់',
@@ -34,6 +35,7 @@ const LABELS = {
     invoice: 'Invoice',
     date: 'Date',
     billedTo: 'Billed to',
+    addressLabel: 'Shop address',
     plan: 'Plan',
     amount: 'Amount',
     paymentMethod: 'Payment method',
@@ -118,12 +120,18 @@ function writePurchasingListPdf(doc, { title, event, items, language }) {
 function writeInvoicePdf(doc, { transaction, language }) {
   const L = getLabels(language);
 
+  // US-24 Scenario 2: use the snapshot taken at charge time, never the chef's current BillingInfo —
+  // so old invoices never change if the chef edits their billing info later.
+  const billingName = transaction.billingNameSnapshot || transaction.chef.displayName || transaction.chef.email;
+  const shopAddress = transaction.shopAddressSnapshot;
+
   doc.font('Bold').fontSize(20).text('Chef SaaS Platform', { align: 'center' });
   doc.moveDown();
   doc.fontSize(14).text(`${L.invoice}: ${transaction.invoiceNumber}`);
   doc.font('Regular').fontSize(12);
   doc.text(`${L.date}: ${formatDate(transaction.createdAt)}`);
-  doc.text(`${L.billedTo}: ${transaction.chef.displayName || transaction.chef.email}`);
+  doc.text(`${L.billedTo}: ${billingName}`);
+  if (shopAddress) doc.text(`${L.addressLabel}: ${shopAddress}`);
   doc.moveDown();
   doc.text(`${L.plan}: ${transaction.plan?.name || '-'}`);
   doc.text(`${L.amount}: $${transaction.amount.toFixed(2)} ${transaction.currency}`);

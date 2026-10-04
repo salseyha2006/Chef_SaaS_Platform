@@ -28,4 +28,16 @@ async function verifyTransaction(gatewayRef) {
   return { verified: true, gatewayRef };
 }
 
-module.exports = { charge, verifyTransaction };
+// US-25 Scenario 3: called automatically once an admin approves a refund request
+async function refund({ gatewayRef, amount, idempotencyKey }) {
+  // TODO: pass `idempotencyKey` as the gateway's idempotency header (US-25 Technical Note)
+  const isSuccess = Math.random() > 0.05;
+
+  if (!isSuccess) {
+    return { success: false, refundRef: null, failureReason: 'Refund declined by gateway (simulated)' };
+  }
+
+  return { success: true, refundRef: `ABA-RF-${Date.now()}-${Math.floor(Math.random() * 10000)}`, failureReason: null };
+}
+
+module.exports = { charge, verifyTransaction, refund };

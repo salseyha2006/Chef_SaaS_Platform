@@ -4,15 +4,38 @@ const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 const { createPdfDocument, writeInvoicePdf } = require('../services/pdf.service');
 
+const VALID_TRANSACTION_STATUSES = ['PENDING', 'SUCCESS', 'FAILED', 'REFUNDED'];
 
-// US-22: View Transaction History
+// US-22: View Transaction History (Scenario 1, 2, 3, 4 — list, empty state, filter, pagination)
 const getTransactionHistory = asyncHandler(async (req, res) => {
-  const transactions = await prisma.transaction.findMany({
-    where: { chefId: req.chef.id },
-    include: { plan: true },
-    orderBy: { createdAt: 'desc' },
-  });
-  return new ApiResponse(200, transactions, 'Transaction history fetched successfully').send(res);
+  const chefId = req.chef.id;
+
+  const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
+  const skip = (page - 1) * limit;
+
+  // Unknown/invalid status values are simply ignored (no filter applied) rather than erroring —
+  // consistent with how other query filters (archived, tag) are handled elsewhere in this API.
+  const status = VALID_TRANSACTION_STATUSES.includes(req.query.status) ? req.query.status : undefined;
+
+  const where = { chefId, status };
+
+  const [items, totalCount] = await Promise.all([
+    prisma.transaction.findMany({
+      where,
+      include: { plan: true },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.transaction.count({ where }),
+  ]);
+
+  return new ApiResponse(
+    200,
+    { items, pagination: { page, limit, totalCount, totalPages: Math.max(1, Math.ceil(totalCount / limit)) } },
+    'Transaction history fetched successfully'
+  ).send(res);
 });
 
 // US-23: View Transaction Detail
@@ -29,7 +52,7 @@ const getTransactionDetail = asyncHandler(async (req, res) => {
   return new ApiResponse(200, transaction, 'Transaction detail fetched successfully').send(res);
 });
 
-// US-23: Download Invoice (PDF)
+// US-23 Scenario 2/3: Download Invoice (PDF) — only for successful transactions
 const downloadInvoice = asyncHandler(async (req, res) => {
   const transaction = await prisma.transaction.findUnique({
     where: { id: req.params.id },
@@ -38,6 +61,14 @@ const downloadInvoice = asyncHandler(async (req, res) => {
 
   if (!transaction || transaction.chefId !== req.chef.id) {
     throw ApiError.notFound('Transaction not found', { code: 'TRANSACTION_NOT_FOUND' });
+  }
+
+  if (transaction.status !== 'SUCCESS') {
+    throw ApiError.badRequest(
+      'Invoice is only available for successful transactions',
+      [],
+      { code: 'INVOICE_NOT_AVAILABLE' }
+    );
   }
 
   res.setHeader('Content-Type', 'application/pdf');
@@ -62,33 +93,9 @@ const updateBillingInfo = asyncHandler(async (req, res) => {
   return new ApiResponse(200, billingInfo, 'Billing information updated successfully').send(res);
 });
 
-// US-25: Request Refund
-const requestRefund = asyncHandler(async (req, res) => {
-  const { reason } = req.body;
-
-  const transaction = await prisma.transaction.findUnique({ where: { id: req.params.id } });
-  if (!transaction || transaction.chefId !== req.chef.id) {
-    throw ApiError.notFound('Transaction not found', { code: 'TRANSACTION_NOT_FOUND' });
-  }
-  if (transaction.status !== 'SUCCESS') {
-    throw ApiError.badRequest('Only successful transactions can be refunded', [], { code: 'REFUND_NOT_ALLOWED' });
-  }
-  if (transaction.refundStatus) {
-    throw ApiError.conflict('A refund has already been requested for this transaction', { code: 'REFUND_ALREADY_REQUESTED' });
-  }
-
-  const updated = await prisma.transaction.update({
-    where: { id: transaction.id },
-    data: { refundStatus: 'REQUESTED', refundReason: reason },
-  });
-
-  return new ApiResponse(200, updated, 'Refund request submitted successfully').send(res);
-});
-
 module.exports = {
   getTransactionHistory,
   getTransactionDetail,
   downloadInvoice,
   updateBillingInfo,
-  requestRefund,
 };

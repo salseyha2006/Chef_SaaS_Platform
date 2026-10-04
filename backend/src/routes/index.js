@@ -17,5 +17,6 @@ router.use('/menu-sets', require('./menuSet.routes'));
 router.use('/events', require('./event.routes'));
 router.use('/vendor-presets', require('./vendorPreset.routes'));
 router.use('/dashboard', require('./dashboard.routes'));
+router.use('/admin', require('./admin.routes'));
 
 module.exports = router;
