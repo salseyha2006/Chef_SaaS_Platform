@@ -36,25 +36,6 @@ async function resendOtp({ email }) {
   return USE_MOCK ? mockAuth.resendOtp({ email }) : api.post('/auth/resend-otp', { email });
 }
 
-/** Bootstrap session: cookie refreshToken → accessToken ថ្មី → /auth/me */
-async function restoreSession() {
-  const r = USE_MOCK ? await mockAuth.refresh() : await api.post('/auth/refresh-token');
-  setAccessToken(r.accessToken);
-  const me = USE_MOCK ? await mockAuth.me() : await api.get('/auth/me');
-  return toChef(me);
-}
-
-/** POST /auth/logout */
-async function logout() {
-  return USE_MOCK ? mockAuth.logout() : api.post('/auth/logout');
-}
-
-/** PATCH /auth/profile */
-async function updateProfile(body) {
-  const data = USE_MOCK ? await mockAuth.updateProfile(body) : await api.patch('/auth/profile', body);
-  return toChef(data);
-}
-
 /** POST /auth/forgot-password → null (ដូចគ្នាទោះ Email មានឬអត់) */
 async function forgotPassword({ email }) {
   return USE_MOCK ? mockAuth.forgotPassword({ email }) : api.post('/auth/forgot-password', { email });
@@ -67,12 +48,55 @@ async function resetPassword({ email, otp, newPassword }) {
     : api.post('/auth/reset-password', { email, otp, newPassword });
 }
 
+/** GET /auth/me → Chef (រួម authProvider, isEmailVerified, hasCompletedOnboarding) */
+async function getMe() {
+  const data = USE_MOCK ? await mockAuth.me() : await api.get('/auth/me');
+  return toChef(data);
+}
+
+/** POST /auth/avatar (multipart field `avatar`) → { avatarUrl } */
+async function uploadAvatar(file) {
+  const fd = new FormData();
+  fd.append('avatar', file);
+  return USE_MOCK ? mockAuth.uploadAvatar(fd) : api.post('/auth/avatar', fd);
+}
+
+/** PATCH /auth/change-password → null. `currentPassword` មិនផ្ញើសម្រាប់ Google-only (Set Password) */
+async function changePassword({ currentPassword, newPassword }) {
+  const body = { newPassword, ...(currentPassword ? { currentPassword } : {}) };
+  return USE_MOCK ? mockAuth.changePassword(body) : api.patch('/auth/change-password', body);
+}
+
+/** Bootstrap session: cookie refreshToken → accessToken ថ្មី → /auth/me */
+async function restoreSession() {
+  const r = USE_MOCK ? await mockAuth.refresh() : await api.post('/auth/refresh-token');
+  setAccessToken(r.accessToken);
+  const me = USE_MOCK ? await mockAuth.me() : await api.get('/auth/me');
+  return toChef(me);
+}
+
+/** POST /auth/logout (revoke refresh token ខាង Server) */
+async function logout() {
+  return USE_MOCK ? mockAuth.logout() : api.post('/auth/logout');
+}
+
+/** PATCH /auth/profile */
+async function updateProfile(body) {
+  const data = USE_MOCK ? await mockAuth.updateProfile(body) : await api.patch('/auth/profile', body);
+  return toChef(data);
+}
+
 export const authService = {
   login,
   google,
   register,
   verifyEmail,
   resendOtp,
+  forgotPassword,
+  resetPassword,
+  getMe,
+  uploadAvatar,
+  changePassword,
   restoreSession,
   logout,
   updateProfile,

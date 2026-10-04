@@ -1,0 +1,21 @@
+{
+  "skip": "Skip",
+  "next": "Next",
+  "start": "Get started",
+  "stepLabel": "Step {{n}}",
+  "error": "Couldn't save. Please try again",
+  "steps": {
+    "ingredients": {
+      "title": "Manage ingredients",
+      "description": "Add ingredients to your stock and set their purchase cost with ease"
+    },
+    "dishes": {
+      "title": "Create dishes",
+      "description": "Dish costs are calculated automatically from their ingredients"
+    },
+    "events": {
+      "title": "Manage events",
+      "description": "Create events, calculate expenses and export reports"
+    }
+  }
+}

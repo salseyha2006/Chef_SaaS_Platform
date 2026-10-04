@@ -7,12 +7,16 @@ import kmLogin from './locales/km/login.json';
 import kmRegister from './locales/km/register.json';
 import kmVerify from './locales/km/verify.json';
 import kmReset from './locales/km/reset.json';
+import kmProfile from './locales/km/profile.json';
+import kmOnboarding from './locales/km/onboarding.json';
 import kmErrors from './locales/km/errors.json';
 import enCommon from './locales/en/common.json';
 import enLogin from './locales/en/login.json';
 import enRegister from './locales/en/register.json';
 import enVerify from './locales/en/verify.json';
 import enReset from './locales/en/reset.json';
+import enProfile from './locales/en/profile.json';
+import enOnboarding from './locales/en/onboarding.json';
 import enErrors from './locales/en/errors.json';
 
 export const SUPPORTED_LANGS = ['km', 'en'];
@@ -26,11 +30,17 @@ i18n.use(initReactI18next).init({
   lng: initialLang,
   fallbackLng: DEFAULT_LANG,
   supportedLngs: SUPPORTED_LANGS,
-  ns: ['common', 'login', 'register', 'verify', 'reset', 'errors'],
+  ns: ['common', 'login', 'register', 'verify', 'reset', 'profile', 'onboarding', 'errors'],
   defaultNS: 'common',
   resources: {
-    km: { common: kmCommon, login: kmLogin, register: kmRegister, verify: kmVerify, reset: kmReset, errors: kmErrors },
-    en: { common: enCommon, login: enLogin, register: enRegister, verify: enVerify, reset: enReset, errors: enErrors },
+    km: {
+      common: kmCommon, login: kmLogin, register: kmRegister, verify: kmVerify,
+      reset: kmReset, profile: kmProfile, onboarding: kmOnboarding, errors: kmErrors,
+    },
+    en: {
+      common: enCommon, login: enLogin, register: enRegister, verify: enVerify,
+      reset: enReset, profile: enProfile, onboarding: enOnboarding, errors: enErrors,
+    },
   },
   interpolation: { escapeValue: false },
   returnNull: false,
@@ -38,7 +48,7 @@ i18n.use(initReactI18next).init({
 
 document.documentElement.lang = initialLang;
 
-/** ប្តូរភាសា + រក្សាទុក (Sync ទៅ Profile ធ្វើក្នុង 2D) */
+/** ប្តូរភាសា + រក្សាទុក localStorage (Sync ទៅ Server ធ្វើក្នុង AuthContext.syncLanguage) */
 export function changeLanguage(lang) {
   if (!SUPPORTED_LANGS.includes(lang)) return Promise.resolve();
   safeStorage.set(LANG_KEY, lang);

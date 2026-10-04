@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import i18n, { changeLanguage, hasStoredLanguage } from '../i18n';
 import { setAccessToken, setAuthFailureHandler } from '../services/api';
 import { authService } from '../services/authService';
+import { mergeChef } from '../utils/format';
 import { safeStorage } from '../utils/storage';
 
 const AuthContext = createContext(null);
@@ -78,9 +79,41 @@ export function AuthProvider({ children }) {
     safeStorage.remove(LOGOUT_BROADCAST_KEY);
   }, [clearSession]);
 
+  /** បញ្ចូល patch ទៅ Chef (ឧ. avatarUrl, displayName ក្រោយ Save) */
+  const updateChef = useCallback((patch) => setChef((prev) => (prev ? mergeChef(prev, patch) : prev)), []);
+
+  /** GET /auth/me → ធ្វើបច្ចុប្បន្នភាព Chef (ដើម្បីបាន authProvider, hasCompletedOnboarding) */
+  const refreshMe = useCallback(async () => {
+    const me = await authService.getMe();
+    setChef((prev) => (prev ? mergeChef(prev, me) : me));
+    return me;
+  }, []);
+
+  /** Sync ភាសាទៅ Server (PATCH /auth/profile) — មិន Block UI បើបរាជ័យ (localStorage រក្សារួចហើយ) */
+  const syncLanguage = useCallback(
+    async (lang) => {
+      try {
+        const c = await authService.updateProfile({ language: lang });
+        updateChef({ language: c.language });
+      } catch { /* ignore */ }
+    },
+    [updateChef],
+  );
+
   const value = useMemo(
-    () => ({ chef, status, isAuthenticated: status === 'authenticated', setChef, login, loginWithGoogle, logout }),
-    [chef, status, login, loginWithGoogle, logout],
+    () => ({
+      chef,
+      status,
+      isAuthenticated: status === 'authenticated',
+      setChef,
+      updateChef,
+      refreshMe,
+      syncLanguage,
+      login,
+      loginWithGoogle,
+      logout,
+    }),
+    [chef, status, updateChef, refreshMe, syncLanguage, login, loginWithGoogle, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

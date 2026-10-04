@@ -20,7 +20,7 @@ function loadGsi() {
 
 /**
  * onCredential(idToken) · onError(code)  (code ∈ GOOGLE_UNAVAILABLE | GOOGLE_CANCELLED)
- * Mock mode: ប៊ូតុង Secondary ធម្មតា ផ្ញើ token ក្លែង
+ * Mock mode ឬគ្មាន CLIENT_ID: ប៊ូតុង Secondary ធម្មតា ផ្ញើ token ក្លែង
  */
 export default function GoogleButton({ label, disabled, onCredential, onError, text = 'signin_with' }) {
   const { i18n } = useTranslation();
@@ -43,7 +43,7 @@ export default function GoogleButton({ label, disabled, onCredential, onError, t
           theme: 'outline',
           size: 'large',
           shape: 'rectangular',
-          text: text,
+          text,
           locale: i18n.resolvedLanguage === 'km' ? 'km' : 'en',
           width: Math.min(holder.current.offsetWidth || 320, 400),
         });

@@ -1,10 +1,11 @@
+import { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 function FullScreenSpinner() {
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <span className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-emerald-600" />
+      <span className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-emerald-600" />
     </div>
   );
 }
@@ -23,5 +24,28 @@ export function PublicOnlyRoute() {
   const { status } = useAuth();
   if (status === 'loading') return <FullScreenSpinner />;
   if (status === 'authenticated') return <Navigate to="/" replace />;
+  return <Outlet />;
+}
+
+/**
+ * US-10: ក្រោយ Login /auth/login មិនផ្តល់ hasCompletedOnboarding (Gap #8)
+ * → ហៅ /auth/me ម្តង។ false → /onboarding។ បរាជ័យ → មិនរារាំង User
+ */
+export function OnboardingGate() {
+  const { chef, refreshMe } = useAuth();
+  const [checking, setChecking] = useState(chef?.hasCompletedOnboarding === undefined);
+
+  useEffect(() => {
+    if (!checking) return undefined;
+    let cancelled = false;
+    refreshMe()
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setChecking(false); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (checking) return <FullScreenSpinner />;
+  if (chef?.hasCompletedOnboarding === false) return <Navigate to="/onboarding" replace />;
   return <Outlet />;
 }

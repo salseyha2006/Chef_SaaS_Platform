@@ -18,7 +18,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = location.state?.from?.pathname || '/';
-  
+
   const [form, setForm] = useState({ email: location.state?.email || '', password: '' });
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState('');
@@ -107,7 +107,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-emerald-50 via-slate-50 to-slate-50">
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-md flex-col px-5 pb-8 pt-[max(1rem,env(safe-area-inset-top))] sm:justify-center">
-        {/* Header */}
         <header className="flex h-14 items-center justify-between">
           <div className="flex items-center gap-2.5">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-btn">
@@ -118,7 +117,6 @@ export default function LoginPage() {
           <LanguageSwitch />
         </header>
 
-        {/* Card */}
         <main className="mt-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
           <h1 className="text-[1.65rem] font-bold leading-normal text-slate-900">{t('title')}</h1>
           <p className="mt-1 text-[15px] text-slate-500">{t('subtitle')}</p>
@@ -206,7 +204,6 @@ export default function LoginPage() {
           />
         </main>
 
-        {/* Footer */}
         <footer className="pt-5 text-center">
           <Link
             to="/register"

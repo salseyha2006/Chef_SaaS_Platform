@@ -1,0 +1,62 @@
+{
+  "title": "My account",
+  "back": "Back",
+  "menu": {
+    "edit": "Edit profile",
+    "password": "Change password",
+    "setPassword": "Set password",
+    "language": "Language",
+    "tutorial": "How it works",
+    "logout": "Log out"
+  },
+  "logoutConfirm": {
+    "title": "Log out?",
+    "message": "You'll need to sign in again to continue",
+    "confirm": "Log out",
+    "cancel": "Cancel"
+  },
+  "toast": {
+    "saved": "Profile saved",
+    "passwordChanged": "Password updated"
+  },
+  "edit": {
+    "title": "Edit profile",
+    "changePhoto": "Change photo",
+    "photoHint": "JPG, PNG or WebP, up to 5MB",
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "email": "Email",
+    "save": "Save",
+    "discardTitle": "Discard changes?",
+    "discardMessage": "Your unsaved changes will be lost",
+    "discardConfirm": "Discard",
+    "keepEditing": "Keep editing",
+    "validation": {
+      "nameRequired": "Name can't be empty",
+      "nameShort": "Name must be at least 2 characters"
+    },
+    "avatar": {
+      "type": "Please choose a JPG, PNG or WebP image",
+      "size": "Image must be 5MB or smaller"
+    }
+  },
+  "password": {
+    "changeTitle": "Change password",
+    "setTitle": "Set password",
+    "setHint": "You signed in with Google. Set a password to also sign in with email",
+    "current": "Current password",
+    "currentPlaceholder": "Enter current password",
+    "new": "New password",
+    "newPlaceholder": "At least 8 characters",
+    "confirm": "Confirm new password",
+    "confirmPlaceholder": "Re-enter new password",
+    "save": "Save",
+    "validation": {
+      "currentRequired": "Please enter your current password",
+      "newRequired": "Please enter a new password",
+      "newShort": "Password must be at least 8 characters",
+      "confirmRequired": "Please confirm your new password",
+      "mismatch": "Passwords do not match"
+    }
+  }
+}
