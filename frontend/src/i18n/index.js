@@ -9,6 +9,7 @@ import kmVerify from './locales/km/verify.json';
 import kmReset from './locales/km/reset.json';
 import kmProfile from './locales/km/profile.json';
 import kmOnboarding from './locales/km/onboarding.json';
+import kmSubscription from './locales/km/subscription.json';
 import kmErrors from './locales/km/errors.json';
 import enCommon from './locales/en/common.json';
 import enLogin from './locales/en/login.json';
@@ -17,7 +18,18 @@ import enVerify from './locales/en/verify.json';
 import enReset from './locales/en/reset.json';
 import enProfile from './locales/en/profile.json';
 import enOnboarding from './locales/en/onboarding.json';
+import enSubscription from './locales/en/subscription.json';
 import enErrors from './locales/en/errors.json';
+import kmPayment from './locales/km/payment.json';
+import enPayment from './locales/en/payment.json';
+import kmBilling from './locales/km/billing.json';
+import enBilling from './locales/en/billing.json';
+import kmCatalog from './locales/km/catalog.json';
+import enCatalog from './locales/en/catalog.json';
+import kmIngredients from './locales/km/ingredients.json';
+import enIngredients from './locales/en/ingredients.json';
+import kmDishes from './locales/km/dishes.json';
+import enDishes from './locales/en/dishes.json';
 
 export const SUPPORTED_LANGS = ['km', 'en'];
 export const DEFAULT_LANG = 'km';
@@ -30,16 +42,24 @@ i18n.use(initReactI18next).init({
   lng: initialLang,
   fallbackLng: DEFAULT_LANG,
   supportedLngs: SUPPORTED_LANGS,
-  ns: ['common', 'login', 'register', 'verify', 'reset', 'profile', 'onboarding', 'errors'],
+  ns: [
+    'common', 'login', 'register', 'verify', 'reset', 'profile', 
+    'onboarding', 'subscription', 'errors', 'payment', 'billing', 
+    'catalog', 'ingredients', 'dishes'
+  ],
   defaultNS: 'common',
   resources: {
     km: {
       common: kmCommon, login: kmLogin, register: kmRegister, verify: kmVerify,
-      reset: kmReset, profile: kmProfile, onboarding: kmOnboarding, errors: kmErrors,
+      reset: kmReset, profile: kmProfile, onboarding: kmOnboarding,
+      subscription: kmSubscription, errors: kmErrors, payment: kmPayment, 
+      billing: kmBilling, catalog: kmCatalog, ingredients: kmIngredients, dishes: kmDishes,
     },
     en: {
       common: enCommon, login: enLogin, register: enRegister, verify: enVerify,
-      reset: enReset, profile: enProfile, onboarding: enOnboarding, errors: enErrors,
+      reset: enReset, profile: enProfile, onboarding: enOnboarding,
+      subscription: enSubscription, errors: enErrors, payment: enPayment, 
+      billing: enBilling, catalog: enCatalog, ingredients: enIngredients, dishes: enDishes,
     },
   },
   interpolation: { escapeValue: false },

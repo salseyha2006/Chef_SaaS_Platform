@@ -108,10 +108,15 @@ export const api = {
   delete: (path, opts) => request(path, { ...opts, method: 'DELETE' }),
 };
 
-/** Binary (PDF/Excel/invoice): មិន unwrap JSON */
-export async function downloadBlob(path, filename, opts = {}) {
+/** Binary (PDF/Excel/invoice) → Blob (មិន unwrap JSON; Error នៅតែជា ApiError) */
+export async function getBlob(path, opts = {}) {
   const res = await send(path, { method: 'GET', ...opts });
-  const blob = await res.blob();
+  return res.blob();
+}
+
+/** ទាញយកផ្ទាល់ (Desktop/ករណីមិនប្រើ Share Sheet) */
+export async function downloadBlob(path, filename, opts = {}) {
+  const blob = await getBlob(path, opts);
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

@@ -1,0 +1,75 @@
+{
+  "back": "Back",
+  "menu": { "title": "Subscription" },
+  "badge": {
+    "trial": "{{days}} days left",
+    "trialLabel": "Free trial",
+    "paid": "Plan expires on {{date}}",
+    "canceled": "Active until {{date}}, not renewing",
+    "expired": "Your plan has expired",
+    "none": "No subscription yet",
+    "expiredHint": "Tap to choose a new plan"
+  },
+  "pricing": {
+    "title": "Choose a plan",
+    "subtitle": "Pick the plan that fits your business",
+    "cycleLabel": "Billing period",
+    "monthly": "Monthly",
+    "yearly": "Yearly (save {{percent}}%)",
+    "per": { "monthly": "/mo", "yearly": "/yr" },
+    "recommended": "Recommended",
+    "select": "Select",
+    "current": "Current plan",
+    "footerNote": "Cancel anytime",
+    "empty": "No plans available for this period yet",
+    "retry": "Try again"
+  },
+  "manage": {
+    "title": "Subscription",
+    "currentPlan": "Current plan",
+    "trialPlan": "Free trial",
+    "noPlan": "No plan yet",
+    "status": {
+      "trial": "Trial",
+      "paid": "Active",
+      "canceled": "Not renewing",
+      "expired": "Expired",
+      "none": "No plan"
+    },
+    "nextRenewal": "Next renewal",
+    "endsOn": "Ends on",
+    "daysLeft": "Remaining",
+    "daysValue": "{{days}} days",
+    "trialNote": "You're on a free trial. Choose a plan to keep using the app after it ends",
+    "canceledNote": "Your plan won't renew. You can keep using it until {{date}}",
+    "choosePlan": "Choose a plan",
+    "changePlan": "Change plan",
+    "cancelAuto": "Cancel auto-renewal",
+    "resume": "Resume auto-renewal",
+    "loadError": "Could not load subscription details"
+  },
+  "cancel": {
+    "title": "Cancel auto-renewal?",
+    "message": "You keep full access until {{date}} and won't be charged again",
+    "confirm": "Cancel renewal",
+    "keep": "Keep renewing"
+  },
+  "toast": {
+    "canceled": "Auto-renewal canceled",
+    "resumed": "Auto-renewal resumed"
+  },
+  "expired": {
+    "title": "Your subscription has expired",
+    "description": "Your data is 100% safe",
+    "hint": "Choose a new plan to continue. All your data is still here",
+    "choose": "Choose a new plan",
+    "viewOnly": "View my data (read-only)",
+    "logout": "Log out"
+  },
+  "upgradePrompt": {
+    "title": "A plan is required",
+    "message": "This feature needs an active plan. Your data is safe — choose a plan to continue",
+    "confirm": "Choose a plan",
+    "cancel": "Later"
+  }
+}

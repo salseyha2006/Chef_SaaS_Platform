@@ -1,0 +1,101 @@
+{
+  "back": "Back",
+  "menu": {
+    "history": "Billing history",
+    "info": "Billing information"
+  },
+  "history": {
+    "title": "Billing history",
+    "infoLink": "Billing information",
+    "filters": {
+      "all": "All",
+      "success": "Successful",
+      "failed": "Failed",
+      "refunded": "Refunded"
+    },
+    "empty": "No payment history yet",
+    "emptyHint": "Transactions will appear here after you choose a plan",
+    "emptyFiltered": "No transactions with this status",
+    "choosePlan": "Choose a plan",
+    "loadMore": "Load more",
+    "loadError": "Could not load history",
+    "retry": "Try again",
+    "fallbackTitle": "Subscription payment"
+  },
+  "status": {
+    "success": "Successful",
+    "failed": "Failed",
+    "refunded": "Refunded",
+    "pending": "Pending"
+  },
+  "refundStatus": {
+    "requested": "Refund under review",
+    "approved": "Refund approved",
+    "rejected": "Refund rejected"
+  },
+  "detail": {
+    "title": "Transaction details",
+    "plan": "Plan",
+    "method": "Payment method",
+    "id": "Transaction ID",
+    "date": "Date & time",
+    "invoiceNo": "Invoice no.",
+    "download": "Download invoice (PDF)",
+    "retry": "Retry payment",
+    "requestRefund": "Request a refund",
+    "notFound": "Transaction not found",
+    "loadError": "Could not load details",
+    "refundReason": "Your reason",
+    "refundNote": {
+      "requested": "We're reviewing your refund request",
+      "approved": "Your refund was approved and the money will be returned",
+      "rejected": "Your refund request was rejected"
+    }
+  },
+  "refund": {
+    "title": "Request a refund",
+    "hint": "Tell us why. Our team will review your request",
+    "reason": "Reason",
+    "placeholder": "e.g. I was charged incorrectly",
+    "submit": "Submit request",
+    "cancel": "Cancel",
+    "validation": {
+      "required": "Please enter a reason",
+      "short": "Reason must be at least 5 characters"
+    }
+  },
+  "retrySheet": {
+    "title": "Retry payment",
+    "hint": "Choose a payment method to try again",
+    "pay": "Pay {{amount}}"
+  },
+  "toast": {
+    "downloaded": "Invoice downloaded",
+    "refundRequested": "Refund request sent",
+    "paid": "Payment successful",
+    "infoSaved": "Billing information saved"
+  },
+  "info": {
+    "title": "Billing information",
+    "snapshotNote": "New invoices will use this information. Invoices already issued won't change",
+    "name": "Shop / business name",
+    "namePlaceholder": "Your shop name",
+    "address": "Address",
+    "addressPlaceholder": "Shop address",
+    "phone": "Phone number",
+    "phonePlaceholder": "012 345 678",
+    "optional": "(optional)",
+    "save": "Save",
+    "discardTitle": "Discard changes?",
+    "discardMessage": "Unsaved changes will be lost",
+    "discardConfirm": "Discard changes",
+    "keepEditing": "Keep editing",
+    "validation": {
+      "nameRequired": "Please enter the shop name",
+      "nameShort": "Name must be at least 2 characters",
+      "addressRequired": "Please enter the address",
+      "addressShort": "Address must be at least 2 characters",
+      "phoneShort": "Phone number must be at least 6 digits"
+    }
+  }
+}

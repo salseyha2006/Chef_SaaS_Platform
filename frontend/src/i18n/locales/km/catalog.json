@@ -1,0 +1,48 @@
+{
+  "title": "ខ្នាត និងប្រភេទ",
+  "back": "ត្រឡប់ក្រោយ",
+  "menu": { "title": "ខ្នាត និងប្រភេទ" },
+  "tabs": { "units": "ខ្នាត", "categories": "ប្រភេទ" },
+  "presetsTitle": "ជ្រើសរើសពីបញ្ជីស្តង់ដារ",
+  "customTitle": "ដែលខ្ញុំបានបង្កើត",
+  "empty": "មិនទាន់មានទិន្នន័យ",
+  "hide": "លាក់",
+  "save": "រក្សាទុក",
+  "cancel": "បោះបង់",
+  "retry": "ព្យាយាមម្តងទៀត",
+  "optional": "(មិនចាំបាច់)",
+  "add": { "units": "បង្កើតខ្នាតថ្មី", "categories": "បង្កើតប្រភេទថ្មី" },
+  "toast": {
+    "imported": "បានបន្ថែមចូលបញ្ជីរបស់អ្នក",
+    "archived": "បានលាក់រួចរាល់",
+    "created": "បានបង្កើតជោគជ័យ",
+    "alreadyInUse": "កំពុងប្រើប្រាស់រួចហើយ"
+  },
+  "archive": {
+    "title": "លាក់ \"{{name}}\"?",
+    "message": "ទិន្នន័យចាស់ដែលធ្លាប់ប្រើនៅតែបង្ហាញត្រឹមត្រូវ តែនឹងមិនលេចក្នុងជម្រើសថ្មីទៀតទេ។",
+    "confirm": "លាក់"
+  },
+  "unit": {
+    "createTitle": "បង្កើតខ្នាតថ្មី",
+    "name": "ឈ្មោះខ្នាត",
+    "namePlaceholder": "ឧ. កញ្ចប់",
+    "abbreviation": "អក្សរកាត់",
+    "abbreviationPlaceholder": "ឧ. pk",
+    "rate": "អត្រាបំប្លែង",
+    "thisUnit": "ខ្នាតនេះ",
+    "rateHint": "1 {{name}} = {{rate}} {{base}}",
+    "type": { "label": "ប្រភេទខ្នាត", "weight": "ទម្ងន់", "volume": "ទំហំ", "count": "ចំនួន" },
+    "validation": {
+      "nameRequired": "សូមបញ្ចូលឈ្មោះខ្នាត",
+      "rateRequired": "អត្រាបំប្លែងចាំបាច់ត្រូវបំពេញ",
+      "ratePositive": "អត្រាបំប្លែងត្រូវធំជាង 0"
+    }
+  },
+  "category": {
+    "createTitle": "បង្កើតប្រភេទថ្មី",
+    "name": "ឈ្មោះប្រភេទ",
+    "namePlaceholder": "ឧ. សាច់",
+    "validation": { "nameRequired": "សូមបញ្ចូលឈ្មោះប្រភេទ" }
+  }
+}

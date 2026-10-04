@@ -1,0 +1,50 @@
+{
+  "back": "Back",
+  "title": "Payment",
+  "summary": {
+    "title": "Order summary",
+    "plan": "{{name}} plan"
+  },
+  "select": {
+    "title": "Choose a payment method",
+    "saved": "Saved methods",
+    "other": "Other methods",
+    "required": "Please choose a payment method",
+    "default": "Default",
+    "soon": "Coming soon",
+    "pay": "Pay {{amount}}"
+  },
+  "methods": {
+    "ABA_PAYWAY": "ABA PayWay",
+    "VISA_MASTERCARD": "Visa / Mastercard",
+    "WING": "Wing"
+  },
+  "processing": {
+    "title": "Processing payment...",
+    "hint": "Please don't close or leave this page",
+    "failedTitle": "Payment not completed",
+    "failedGeneric": "The payment didn't go through. Try again or use another payment method",
+    "retry": "Try again",
+    "changeMethod": "Use another payment method"
+  },
+  "reasons": {
+    "CARD_DECLINED": "Your card was declined",
+    "INSUFFICIENT_FUNDS": "Insufficient funds"
+  },
+  "load": {
+    "notFound": "Plan not found",
+    "error": "Could not load plan details",
+    "retry": "Try again",
+    "choosePlan": "Choose a plan"
+  },
+  "success": {
+    "title": "Payment successful!",
+    "plan": "Plan",
+    "amount": "Amount",
+    "paidAt": "Paid on",
+    "renewsOn": "Renews on",
+    "reference": "Transaction ID",
+    "emailNote": "We've sent a receipt to your email",
+    "home": "Go to home"
+  }
+}

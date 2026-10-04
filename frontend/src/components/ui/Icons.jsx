@@ -151,3 +151,79 @@ export const HelpIcon = (p) => (
     <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5M12 17v.01" />
   </svg>
 );
+
+export const CheckIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="m5 12.5 4.5 4.5L19 7.5" />
+  </svg>
+);
+
+export const ShieldCheckIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M12 3 5 6v5c0 4.4 3 8 7 10 4-2 7-5.6 7-10V6l-7-3Z" />
+    <path d="m9 12 2.2 2.2L15 10.5" />
+  </svg>
+);
+
+export const CreditCardIcon = (p) => (
+  <svg {...base} {...p}>
+    <rect x="3" y="5" width="18" height="14" rx="3" />
+    <path d="M3 10h18M7 15h3" />
+  </svg>
+);
+
+export const SparklesIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8L12 3Z" />
+    <path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z" />
+  </svg>
+);
+
+export const ReceiptIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z" />
+    <path d="M9 8h6M9 12h6" />
+  </svg>
+);
+
+export const DownloadIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 20h14" />
+  </svg>
+);
+
+export const StoreIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M4 9l1.5-5h13L20 9" />
+    <path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9" />
+    <path d="M5 12v8h14v-8M10 20v-4h4v4" />
+  </svg>
+);
+
+export const PlusIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+);
+
+export const TagIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M3 12V4h8l10 10-8 8L3 12z" />
+    <circle cx="7.5" cy="8.5" r="1.2" />
+  </svg>
+);
+
+export const SearchIcon = (p) => (
+  <svg {...base} {...p}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" />
+  </svg>
+);
+
+export const MoreIcon = (p) => (
+  <svg {...base} {...p}>
+    <circle cx="12" cy="5" r="1.4" />
+    <circle cx="12" cy="12" r="1.4" />
+    <circle cx="12" cy="19" r="1.4" />
+  </svg>
+);

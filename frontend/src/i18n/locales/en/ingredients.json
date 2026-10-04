@@ -1,0 +1,77 @@
+{
+  "back": "Back",
+  "retry": "Try again",
+  "menu": { "browse": "Add ingredients from presets", "stock": "Ingredient stock" },
+  "inStock": "In stock",
+  "inStockHint": "Already in your stock",
+  "selectedCount": "Selected ({{count}})",
+  "browse": {
+    "title": "Select ingredients",
+    "searchPlaceholder": "Search ingredients...",
+    "noResults": "No ingredients found",
+    "empty": "No presets available yet",
+    "next": "Next →"
+  },
+  "pricing": {
+    "title": "Set price & unit",
+    "note": "Enter the purchase price and unit for each ingredient",
+    "price": "Purchase price",
+    "pricePlaceholder": "0.00",
+    "unit": "Unit",
+    "unitPlaceholder": "Select unit",
+    "save": "Save all",
+    "validation": {
+      "priceRequired": "Please enter a price",
+      "pricePositive": "Price must be greater than 0",
+      "unitRequired": "Please select a unit"
+    },
+    "discardTitle": "Cancel import?",
+    "discardMessage": "Your changes will be lost and all selections will be cleared",
+    "discardConfirm": "Cancel import",
+    "keepEditing": "Keep editing"
+  },
+  "stock": {
+    "title": "Ingredient stock",
+    "searchPlaceholder": "Search stock...",
+    "all": "All",
+    "allIn": "All in {{name}}",
+    "expand": "Show sub-categories",
+    "sort": { "label": "Sort", "name": "By name", "priceAsc": "Price low → high", "priceDesc": "Price high → low" },
+    "empty": "No ingredients in stock yet",
+    "emptyCta": "Add now",
+    "noMatch": "No ingredients found",
+    "add": "Add ingredients"
+  },
+  "detail": {
+    "price": "Purchase price",
+    "unit": "Unit",
+    "category": "Category",
+    "categoryPlaceholder": "Select category",
+    "save": "Save changes",
+    "notFound": "Ingredient not found",
+    "backToStock": "Back to stock",
+    "menu": {
+      "title": "Options",
+      "cancel": "Close",
+      "archive": "Hide from stock (Archive)",
+      "delete": "Delete permanently"
+    },
+    "archiveTitle": "Hide \"{{name}}\" from stock?",
+    "archiveMessage": "It will no longer appear in your active stock, but existing dishes keep their cost data.",
+    "archiveConfirm": "Hide",
+    "deleteTitle": "Permanently delete \"{{name}}\"?",
+    "deleteMessage": "This action cannot be undone.",
+    "deleteConfirm": "Delete",
+    "inUseWarning": "Cannot delete: it is used in {{count}} dish(es). You can hide it instead.",
+    "archiveInstead": "Hide instead",
+    "discardTitle": "Discard changes?",
+    "discardMessage": "Your changes will be lost",
+    "discardConfirm": "Discard"
+  },
+  "toast": {
+    "imported": "Imported {{count}} ingredients",
+    "saved": "Changes saved",
+    "archived": "Hidden from stock",
+    "deleted": "Deleted permanently"
+  }
+}

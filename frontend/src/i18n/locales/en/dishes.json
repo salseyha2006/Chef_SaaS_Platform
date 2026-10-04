@@ -1,0 +1,94 @@
+{
+  "back": "Back",
+  "retry": "Try again",
+  "list": {
+    "title": "My Dishes",
+    "add": "Create dish",
+    "empty": "No dishes yet",
+    "emptyCta": "Create your first dish",
+    "noMatch": "No dishes found",
+    "totalCost": "Total cost",
+    "noCost": "—",
+    "emptyArchived": "No archived dishes",
+    "tabs": { "active": "Active", "archived": "Archived" }
+  },
+  "view": {
+    "label": "View mode",
+    "list": "List",
+    "grid": "Cards"
+  },
+  "toast": {
+    "created": "Dish created",
+    "updated": "Changes saved",
+    "duplicated": "Dish duplicated",
+    "archived": "Dish archived",
+    "deleted": "Dish deleted"
+  },
+  "detail": {
+    "total": "Total cost",
+    "breakdown": "Cost breakdown",
+    "noBreakdown": "No ingredient data",
+    "highest": "Highest",
+    "archivedBadge": "Archived",
+    "duplicating": "Duplicating...",
+    "col": { "ingredient": "Ingredient", "quantity": "Quantity", "unitPrice": "Unit price", "subtotal": "Subtotal" },
+    "menu": {
+      "title": "Options",
+      "cancel": "Close",
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "archive": "Archive",
+      "delete": "Delete permanently"
+    },
+    "cancel": "Cancel",
+    "archiveTitle": "Archive \"{{name}}\"?",
+    "archiveMessage": "This dish will leave the active list. Its data and past events stay intact.",
+    "archiveConfirm": "Archive",
+    "deleteTitle": "Delete \"{{name}}\" permanently?",
+    "deleteMessage": "This cannot be undone.",
+    "deleteConfirm": "Delete",
+    "inUseWarning": "Cannot delete: used in {{count}} menu set(s). You can archive it instead.",
+    "archiveInstead": "Archive instead"
+  },
+  "form": {
+    "titleNew": "Create dish",
+    "titleEdit": "Edit dish",
+    "name": "Dish name",
+    "namePlaceholder": "e.g. Stir-fried chicken",
+    "description": "Description (optional)",
+    "imageUrl": "Image link (optional)",
+    "tags": "Dish type (Tag)",
+    "tagPlaceholder": "Type a new tag",
+    "tagAdd": "Add",
+    "ingredients": "Ingredients",
+    "addIngredient": "Add ingredient",
+    "removeIngredient": "Remove {{name}}",
+    "quantity": "Quantity used",
+    "totalCost": "Total cost",
+    "totalNote": "Estimate from stock prices — final cost is calculated on save",
+    "save": "Save",
+    "notFound": "Dish not found",
+    "backToList": "Back to dishes",
+    "droppedWarning": "{{names}} are not in your active stock (possibly archived) and will be removed on save",
+    "discardTitle": "Discard changes?",
+    "discardMessage": "Unsaved changes will be lost",
+    "discardConfirm": "Discard",
+    "keepEditing": "Keep editing",
+    "validation": {
+      "nameRequired": "Please enter a dish name",
+      "ingredientsRequired": "Add at least one ingredient",
+      "qtyRequired": "Enter a quantity",
+      "qtyPositive": "Quantity must be greater than 0"
+    }
+  },
+  "picker": {
+    "title": "Select ingredients",
+    "searchPlaceholder": "Search stock...",
+    "selected": "Selected ({{count}})",
+    "add": "Add →",
+    "alreadyAdded": "Already added",
+    "empty": "Your ingredient stock is empty",
+    "emptyCta": "Add ingredients first",
+    "noMatch": "No ingredients found"
+  }
+}

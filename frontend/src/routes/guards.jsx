@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useSubscription } from '../context/SubscriptionContext';
 
 function FullScreenSpinner() {
   return (
@@ -47,5 +48,16 @@ export function OnboardingGate() {
 
   if (checking) return <FullScreenSpinner />;
   if (chef?.hasCompletedOnboarding === false) return <Navigate to="/onboarding" replace />;
+  return <Outlet />;
+}
+
+/**
+ * US-17 Scenario 1: Expired → បង្ហាញទំព័រ Lockout រួសរាយ
+ * Scenario 2: User ជ្រើស "មើលទិន្នន័យ (View-only)" → ឆ្លងបាន (Backend ទប់ស្កាត់ Action សរសេរ)
+ */
+export function SubscriptionGate() {
+  const { status, state, viewOnly } = useSubscription();
+  if (status === 'idle' || status === 'loading') return <FullScreenSpinner />;
+  if (state?.isLocked && !viewOnly) return <Navigate to="/subscription-expired" replace />;
   return <Outlet />;
 }

@@ -1,0 +1,48 @@
+{
+  "title": "Units & Categories",
+  "back": "Back",
+  "menu": { "title": "Units & Categories" },
+  "tabs": { "units": "Units", "categories": "Categories" },
+  "presetsTitle": "Choose from standard list",
+  "customTitle": "Created by me",
+  "empty": "Nothing here yet",
+  "hide": "Hide",
+  "save": "Save",
+  "cancel": "Cancel",
+  "retry": "Try again",
+  "optional": "(optional)",
+  "add": { "units": "Create new unit", "categories": "Create new category" },
+  "toast": {
+    "imported": "Added to your list",
+    "archived": "Hidden",
+    "created": "Created successfully",
+    "alreadyInUse": "Already in use"
+  },
+  "archive": {
+    "title": "Hide \"{{name}}\"?",
+    "message": "Existing data that used it still displays correctly, but it won't appear in new choices.",
+    "confirm": "Hide"
+  },
+  "unit": {
+    "createTitle": "Create new unit",
+    "name": "Unit name",
+    "namePlaceholder": "e.g. Pack",
+    "abbreviation": "Abbreviation",
+    "abbreviationPlaceholder": "e.g. pk",
+    "rate": "Conversion rate",
+    "thisUnit": "this unit",
+    "rateHint": "1 {{name}} = {{rate}} {{base}}",
+    "type": { "label": "Unit type", "weight": "Weight", "volume": "Volume", "count": "Count" },
+    "validation": {
+      "nameRequired": "Please enter a unit name",
+      "rateRequired": "Conversion rate is required",
+      "ratePositive": "Conversion rate must be greater than 0"
+    }
+  },
+  "category": {
+    "createTitle": "Create new category",
+    "name": "Category name",
+    "namePlaceholder": "e.g. Meat",
+    "validation": { "nameRequired": "Please enter a category name" }
+  }
+}

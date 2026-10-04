@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeftIcon } from './ui/Icons';
 
-/** Header ទំព័រក្នុងប្រព័ន្ធ។ props: title, backTo (Link) ឬ onBack (button), backLabel */
-export default function PageHeader({ title, backTo, onBack, backLabel = 'Back' }) {
+/** Header ទំព័រ។ props: title, backTo (Link) ឬ onBack (button), backLabel, right (Node ខាងស្តាំ) */
+export default function PageHeader({ title, backTo, onBack, backLabel = 'Back', right }) {
   const cls =
     '-ml-2 flex h-11 w-11 items-center justify-center rounded-full text-slate-700 hover:bg-slate-100 active:bg-slate-200';
   return (
@@ -17,7 +17,8 @@ export default function PageHeader({ title, backTo, onBack, backLabel = 'Back' }
             <ArrowLeftIcon />
           </Link>
         )}
-        <h1 className="truncate text-lg font-semibold text-slate-900">{title}</h1>
+        <h1 className="min-w-0 flex-1 truncate text-lg font-semibold text-slate-900">{title}</h1>
+        {right}
       </div>
     </header>
   );

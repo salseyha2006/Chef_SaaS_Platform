@@ -17,10 +17,15 @@ export default {
           '70%': { transform: 'scale(1.1)', opacity: '1' },
           '100%': { transform: 'scale(1)' },
         },
+        slideDown: {
+          '0%': { opacity: '0', transform: 'translateY(-6px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         shake: 'shake .4s ease-in-out',
         pop: 'pop .45s ease-out',
+        'slide-down': 'slideDown .15s ease-out',
       },
     },
   },

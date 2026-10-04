@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import PageHeader from '../components/PageHeader';
 import LanguageSwitch from '../components/LanguageSwitch';
+import SubscriptionBadge from '../components/subscription/SubscriptionBadge';
 import Avatar from '../components/ui/Avatar';
 import ConfirmModal from '../components/ui/ConfirmModal';
 import Toast from '../components/ui/Toast';
 import {
-  ChevronRightIcon, GlobeIcon, HelpIcon, LockIcon, LogOutIcon, UserIcon,
+  ChevronRightIcon, CreditCardIcon, GlobeIcon, HelpIcon, LockIcon, LogOutIcon, UserIcon,
+  ReceiptIcon, StoreIcon, TagIcon, BasketIcon
 } from '../components/ui/Icons';
 
 function Row({ to, state, icon: Icon, children, trailing }) {
@@ -27,6 +29,10 @@ function Row({ to, state, icon: Icon, children, trailing }) {
 
 export default function ProfilePage() {
   const { t } = useTranslation('profile');
+  const { t: ts } = useTranslation('subscription');
+  const { t: tb } = useTranslation('billing');
+  const { t: tc } = useTranslation('catalog');
+  const { t: ti } = useTranslation('ingredients');
   const { chef, logout, syncLanguage } = useAuth();
   const location = useLocation();
 
@@ -55,8 +61,18 @@ export default function ProfilePage() {
           </div>
         </section>
 
+        <SubscriptionBadge className="mt-5" />
+
         <section className="mt-5 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card">
           <Row to="/profile/edit" icon={UserIcon}>{t('menu.edit')}</Row>
+          <Row to="/subscription" icon={CreditCardIcon}>{ts('menu.title')}</Row>
+          <Row to="/billing" icon={ReceiptIcon}>{tb('menu.history')}</Row>
+          <Row to="/billing/info" icon={StoreIcon}>{tb('menu.info')}</Row>
+          <Row to="/settings/catalog" icon={TagIcon}>{tc('menu.title')}</Row>
+          
+          {/* ប្តូរពី /ingredients/browse ទៅជា /ingredients (Stock) */}
+          <Row to="/ingredients" icon={BasketIcon}>{ti('menu.stock')}</Row>
+          
           <Row to="/profile/password" icon={LockIcon}>
             {isGoogleOnly ? t('menu.setPassword') : t('menu.password')}
           </Row>
