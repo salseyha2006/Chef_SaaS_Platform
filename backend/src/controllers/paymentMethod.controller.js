@@ -3,7 +3,6 @@ const ApiError = require('../utils/ApiError');
 const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 
-// US-18 Scenario 2: list saved payment methods (always masked — last4 + brand only)
 const getSavedPaymentMethods = asyncHandler(async (req, res) => {
   const methods = await prisma.savedPaymentMethod.findMany({
     where: { chefId: req.chef.id },
@@ -13,13 +12,12 @@ const getSavedPaymentMethods = asyncHandler(async (req, res) => {
   return new ApiResponse(200, methods, 'Saved payment methods fetched successfully').send(res);
 });
 
-// Save a card token already issued by the gateway's own SDK
 const addSavedPaymentMethod = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { provider, gatewayToken, last4, brand, isDefault } = req.body;
 
   const existingCount = await prisma.savedPaymentMethod.count({ where: { chefId } });
-  const shouldBeDefault = isDefault || existingCount === 0; // first saved card is auto-default
+  const shouldBeDefault = isDefault || existingCount === 0;
 
   const saved = await prisma.$transaction(async (tx) => {
     if (shouldBeDefault) {
@@ -65,7 +63,6 @@ const deleteSavedPaymentMethod = asyncHandler(async (req, res) => {
 
   await prisma.savedPaymentMethod.delete({ where: { id } });
 
-  // Promote the most recently added remaining card to default, if one exists
   if (method.isDefault) {
     const next = await prisma.savedPaymentMethod.findFirst({
       where: { chefId },

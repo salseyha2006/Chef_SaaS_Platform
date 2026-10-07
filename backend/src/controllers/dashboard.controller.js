@@ -2,7 +2,6 @@ const prisma = require('../config/db');
 const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 
-// US-54: View Dashboard (Overview)
 const getDashboard = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const now = new Date();

@@ -4,7 +4,6 @@ const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 const { buildShoppingList } = require('../services/shoppingList.service');
 
-// US-55: Create & Save Vendor Presets
 const createVendorPreset = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { name, chefIngredientIds } = req.body;
@@ -95,7 +94,6 @@ const deleteVendorPreset = asyncHandler(async (req, res) => {
   return new ApiResponse(200, null, 'Vendor preset deleted successfully').send(res);
 });
 
-// US-56: View & Filter Shopping List by Vendor Preset
 const getShoppingListByVendor = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { eventId, vendorPresetId } = req.params;

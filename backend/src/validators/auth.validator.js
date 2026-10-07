@@ -16,7 +16,7 @@ const loginSchema = z.object({
 
 const googleLoginSchema = z.object({
   idToken: z.string().min(10, 'idToken is required'),
-  language: languageSchema.optional(), // used only when a brand-new chef is created
+  language: languageSchema.optional(),
 });
 
 const verifyEmailSchema = z.object({
@@ -46,6 +46,7 @@ const changePasswordSchema = z.object({
 const updateProfileSchema = z.object({
   displayName: z.string().min(2).optional(),
   language: languageSchema.optional(),
+  dishViewMode: z.enum(['list', 'card']).optional(),
 });
 
 module.exports = {

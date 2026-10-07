@@ -13,6 +13,7 @@ router.get('/:id', requireAuth, dishController.getDishDetail);
 router.patch('/:id', requireAuth, requireActiveSubscription, validate(updateDishSchema), dishController.updateDish);
 router.post('/:id/duplicate', requireAuth, requireActiveSubscription, dishController.duplicateDish);
 router.patch('/:id/archive', requireAuth, requireActiveSubscription, dishController.archiveDish);
+router.patch('/:id/restore', requireAuth, requireActiveSubscription, dishController.restoreDish);
 router.delete('/:id', requireAuth, requireActiveSubscription, dishController.deleteDish);
 
 module.exports = router;

@@ -16,35 +16,36 @@ const updateUnitSchema = z.object({
 
 const createCategorySchema = z.object({
   name: z.string().min(1, 'Category name is required'),
+  parentId: z.string().uuid().optional(),
 });
 
 const updateCategorySchema = z.object({
-  name: z.string().min(1, 'Category name is required'),
+  name: z.string().min(1).optional(),
+  parentId: z.string().uuid().nullable().optional(),
 });
 
 const importIngredientsSchema = z.object({
   items: z
     .array(
       z.object({
-        ingredientId: z.string().uuid(), // global preset id
-        purchasePrice: z.number().nonnegative(),
-        unitId: z.string().uuid(), // this chef's own ChefUnit id
+        ingredientId: z.string().uuid(),
+        purchasePrice: z.number().positive('Price must be greater than 0'),
+        unitId: z.string().uuid(),
       })
     )
     .min(1, 'At least one ingredient is required'),
 });
 
-// US-11 Scenario 2: brand-new custom ingredient, not copied from any preset
 const createIngredientSchema = z.object({
   name: z.string().min(1, 'Ingredient name is required'),
-  purchasePrice: z.number().nonnegative(),
+  purchasePrice: z.number().positive('Price must be greater than 0'),
   unitId: z.string().uuid(),
   categoryId: z.string().uuid().optional(),
 });
 
 const updateChefIngredientSchema = z.object({
   name: z.string().min(1).optional(),
-  purchasePrice: z.number().nonnegative().optional(),
+  purchasePrice: z.number().positive('Price must be greater than 0').optional(),
   unitId: z.string().uuid().optional(),
   categoryId: z.string().uuid().optional(),
 });

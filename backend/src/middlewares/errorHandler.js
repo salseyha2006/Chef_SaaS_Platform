@@ -24,7 +24,6 @@ function errorHandler(err, req, res, next) {
 
   if (error.statusCode >= 500) {
     console.error(err);
-    // Never leak internal details (e.g. Prisma/SQL messages) to clients in production
     if (process.env.NODE_ENV === 'production') {
       error = ApiError.internal('Internal server error');
     }

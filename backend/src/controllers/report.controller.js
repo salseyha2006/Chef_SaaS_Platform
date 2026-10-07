@@ -1,4 +1,3 @@
-const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const prisma = require('../config/db');
 const ApiError = require('../utils/ApiError');
@@ -14,7 +13,7 @@ async function resolveReportItems(eventId, overrideItems) {
   return result.items;
 }
 
-// US-58: Generate Custom PDF Purchasing Report (A4) — name + quantity ONLY (business secret: hide price)
+// US-58: Generate Custom PDF Purchasing Report (A4) — name + quantity ONLY
 const generatePdfReport = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { eventId } = req.params;
@@ -37,7 +36,7 @@ const generatePdfReport = asyncHandler(async (req, res) => {
   doc.end();
 });
 
-// US-59: Export Cost Report to Excel — FULL detail (dish, ingredient, quantity, unit price, total)
+// US-59: Export Cost Report to Excel — FULL detail
 const exportExcelReport = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { eventId } = req.params;

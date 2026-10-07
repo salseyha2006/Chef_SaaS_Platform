@@ -119,7 +119,6 @@ async function sendOtpEmail(toEmail, otp, purpose = 'verification', language = D
   await transporter.sendMail({ from: process.env.EMAIL_FROM, to: toEmail, subject, html });
 }
 
-// US-14/US-21 Scenario 2: send a payment receipt with the invoice PDF attached
 async function sendReceiptEmail({ toEmail, transaction, language = DEFAULT_LANGUAGE, pdfBuffer }) {
   const lang = RECEIPT_TEMPLATES[language] ? language : DEFAULT_LANGUAGE;
   const t = RECEIPT_TEMPLATES[lang];
@@ -145,7 +144,6 @@ async function sendReceiptEmail({ toEmail, transaction, language = DEFAULT_LANGU
   });
 }
 
-// US-19 Scenario 2 + US-20 Technical Note: notify on every failed auto-charge attempt
 async function sendPaymentFailedEmail({
   toEmail,
   language = DEFAULT_LANGUAGE,
@@ -171,7 +169,6 @@ async function sendPaymentFailedEmail({
   await transporter.sendMail({ from: process.env.EMAIL_FROM, to: toEmail, subject: t.subject, html });
 }
 
-// US-25 Scenario 3: notify the chef once an admin approves their refund
 async function sendRefundApprovedEmail({ toEmail, language = DEFAULT_LANGUAGE, transaction }) {
   const lang = REFUND_TEMPLATES[language] ? language : DEFAULT_LANGUAGE;
   const t = REFUND_TEMPLATES[lang];
@@ -188,7 +185,6 @@ async function sendRefundApprovedEmail({ toEmail, language = DEFAULT_LANGUAGE, t
   await transporter.sendMail({ from: process.env.EMAIL_FROM, to: toEmail, subject: t.approvedSubject, html });
 }
 
-// US-25 Scenario 4: notify the chef with the admin's reason when a refund is rejected
 async function sendRefundRejectedEmail({ toEmail, language = DEFAULT_LANGUAGE, transaction, reason }) {
   const lang = REFUND_TEMPLATES[language] ? language : DEFAULT_LANGUAGE;
   const t = REFUND_TEMPLATES[lang];

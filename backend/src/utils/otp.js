@@ -2,6 +2,7 @@ const crypto = require('crypto');
 
 const OTP_EXPIRY_MINUTES = 10;
 
+// Cryptographically secure 6-digit code (US-04 Technical Note)
 function generateOtp() {
   return crypto.randomInt(100000, 1000000).toString();
 }

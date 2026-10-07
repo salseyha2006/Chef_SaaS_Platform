@@ -45,6 +45,12 @@ enum PresetSource {
   CUSTOM
 }
 
+// US-37/Event (Epic 11): whether a Dish's ingredient quantities scale with event table count
+enum PricingType {
+  PER_TABLE
+  FIXED
+}
+
 // ── Epic 2: Authentication & Profile ─────────────────────────────
 
 model Chef {
@@ -59,7 +65,7 @@ model Chef {
   isEmailVerified   Boolean      @default(false)
   emailOtp          String?
   emailOtpExpiresAt DateTime?
-  emailOtpResendCount      Int       @default(0)
+  emailOtpResendCount       Int       @default(0)
   emailOtpResendWindowStart DateTime?
 
   resetOtp          String?
@@ -69,21 +75,23 @@ model Chef {
   lockedUntil       DateTime?
 
   hasCompletedOnboarding Boolean @default(false)
-  trialUsed              Boolean @default(false) // US-12: permanent flag, prevents re-triggering a free trial
   language          String       @default("km")
+  dishViewMode      String       @default("list") // US-44: "list" | "card", synced across devices
 
-  refreshTokens     RefreshToken[]
-  subscription      Subscription?
-  transactions      Transaction[]
-  billingInfo       BillingInfo?
-  savedPaymentMethods SavedPaymentMethod[]
-  chefUnits         ChefUnit[]
-  chefCategories    ChefCategory[]
-  ingredients       ChefIngredient[]
-  dishes            Dish[]
-  menuSets          MenuSet[]
-  events            Event[]
-  vendorPresets     VendorPreset[]
+  trialUsed         Boolean      @default(false) // US-12: permanent flag, prevents re-triggering a free trial
+
+  refreshTokens       RefreshToken[]
+  subscription         Subscription?
+  transactions          Transaction[]
+  billingInfo           BillingInfo?
+  savedPaymentMethods   SavedPaymentMethod[]
+  chefUnits             ChefUnit[]
+  chefCategories        ChefCategory[]
+  ingredients           ChefIngredient[]
+  dishes                Dish[]
+  menuSets               MenuSet[]
+  events                 Event[]
+  vendorPresets           VendorPreset[]
 
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
@@ -112,8 +120,8 @@ model Unit {
   unitType       String   // "weight" | "volume" | "count"
   conversionRate Float
 
-  ingredients    Ingredient[]
-  chefUnits      ChefUnit[]
+  ingredients     Ingredient[]
+  chefUnits       ChefUnit[]
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -122,16 +130,21 @@ model Unit {
 }
 
 model Category {
-  id          String       @id @default(uuid())
-  name        String       @unique
+  id       String @id @default(uuid())
+  name     String @unique
+
+  parentId String?
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
 
   ingredients     Ingredient[]
   chefCategories  ChefCategory[]
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("categories")
+  @@index([parentId])
 }
 
 model Ingredient {
@@ -172,6 +185,7 @@ model ChefUnit {
   isActive       Boolean      @default(true) // US-30 soft delete
 
   chefIngredients ChefIngredient[]
+  dishIngredients DishIngredient[]
 
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
@@ -189,6 +203,10 @@ model ChefCategory {
 
   name           String
 
+  parentId String?
+  parent   ChefCategory?  @relation("ChefCategoryHierarchy", fields: [parentId], references: [id])
+  children ChefCategory[] @relation("ChefCategoryHierarchy")
+
   source         PresetSource @default(CUSTOM)
   sourcePresetId String?
   sourcePreset   Category?    @relation(fields: [sourcePresetId], references: [id])
@@ -204,6 +222,7 @@ model ChefCategory {
   @@unique([chefId, sourcePresetId])
   @@map("chef_categories")
   @@index([chefId])
+  @@index([parentId])
 }
 
 model ChefIngredient {
@@ -273,6 +292,7 @@ model Subscription {
   endDate     DateTime
   autoRenew   Boolean            @default(true)
   canceledAt  DateTime?
+
   retryCount       Int       @default(0) // US-20: auto-retry attempts for the current billing cycle
   renewalLockedAt  DateTime? // US-19 Scenario 3: idempotency claim while the cron is charging this subscription
 
@@ -307,10 +327,10 @@ model Transaction {
   failureReason   String?
   invoiceNumber   String?           @unique
 
-  refundStatus    RefundStatus?
-  refundReason    String?
-  refundReviewedBy  String?   // admin identifier (stub — no full admin user model yet)
-  refundReviewedAt  DateTime?
+  refundStatus      RefundStatus?
+  refundReason       String?
+  refundReviewedBy   String?   // admin identifier (stub — no full admin user model yet)
+  refundReviewedAt   DateTime?
 
   // US-24 Scenario 2: captured at charge time so old invoices never change if BillingInfo is edited later
   billingNameSnapshot String?
@@ -369,6 +389,7 @@ model Dish {
   description String?
   imageUrl    String?
   tags        String[] @default([])
+  pricingType PricingType @default(PER_TABLE) // FIXED = counted once per event, not × tableCount
 
   totalCost   Float    @default(0)
   isArchived  Boolean  @default(false)
@@ -391,6 +412,12 @@ model DishIngredient {
   chefIngredientId String
   chefIngredient   ChefIngredient @relation(fields: [chefIngredientId], references: [id])
   quantityUsed     Float
+
+  // US-37 Technical Note: optional override unit for this recipe line — if set and different
+  // from the ChefIngredient's stocked unit, quantityUsed is converted via unitConversion.js
+  // before costing. Null = assume same unit as stock (backward compatible).
+  unitId           String?
+  unit             ChefUnit?      @relation(fields: [unitId], references: [id])
 
   @@unique([dishId, chefIngredientId])
   @@map("dish_ingredients")

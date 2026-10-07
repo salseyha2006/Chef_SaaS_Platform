@@ -5,7 +5,7 @@ const { generateInvoicePdfBuffer } = require('../services/pdf.service');
 const { sendReceiptEmail, sendPaymentFailedEmail } = require('../services/email.service');
 
 const MAX_AUTO_RETRY_ATTEMPTS = 3; // US-20 Technical Note: total attempts per cycle (configurable default)
-const LOCK_STALE_MINUTES = 10; // safety timeout in case a previous run crashed mid-charge
+const LOCK_STALE_MINUTES = 10;
 
 // US-19 Scenario 3: atomic claim so overlapping/duplicate cron runs never double-charge the same cycle
 async function claimSubscriptionForRenewal(subscriptionId) {
@@ -51,7 +51,7 @@ async function sendPaymentFailedEmailSafely(chef, plan, reason, retryCount, isFi
 
 async function handleAutoRenewal(sub) {
   const claimed = await claimSubscriptionForRenewal(sub.id);
-  if (!claimed) return; // another process is already handling this subscription's renewal
+  if (!claimed) return;
 
   const defaultMethod = await prisma.savedPaymentMethod.findFirst({
     where: { chefId: sub.chefId, isDefault: true },
@@ -68,16 +68,12 @@ async function handleAutoRenewal(sub) {
       paymentMethod: defaultMethod.provider,
       savedPaymentMethodId: defaultMethod.id,
       subscriptionId: sub.id,
-      // US-19 Technical Note: idempotency key tied to this specific billing cycle
       idempotencyKey: `${sub.id}-${sub.endDate.toISOString()}`,
     });
     success = result.success;
     transaction = result.transaction;
     failureReason = transaction?.failureReason || failureReason;
   }
-  // else: no saved card at all — nothing to charge, so no Transaction row is created for this
-  // attempt (there was no payment method to attribute it to); the failure is still counted
-  // toward the retry limit and the chef is still notified below.
 
   if (success) {
     await prisma.subscription.update({
@@ -94,7 +90,7 @@ async function handleAutoRenewal(sub) {
   await prisma.subscription.update({
     where: { id: sub.id },
     data: {
-      status: isFinalAttempt ? 'EXPIRED' : 'PAST_DUE', // US-20 Scenario 3: graceful lockout after final attempt
+      status: isFinalAttempt ? 'EXPIRED' : 'PAST_DUE', // US-20 Scenario 3: graceful lockout
       retryCount: newRetryCount,
       renewalLockedAt: null,
     },
@@ -119,7 +115,6 @@ async function processExpiredSubscriptions() {
       await handleAutoRenewal(sub);
       renewalAttempts++;
     } else {
-      // US-16 Scenario 2 (chef canceled auto-renew) / trial ending: no retry, straight to lockout
       await prisma.subscription.update({ where: { id: sub.id }, data: { status: 'EXPIRED' } });
       directExpirations++;
     }
@@ -131,7 +126,6 @@ async function processExpiredSubscriptions() {
 }
 
 function startSubscriptionCron() {
-  // Runs every day at 00:10
   cron.schedule('10 0 * * *', () => {
     processExpiredSubscriptions().catch((err) => console.error('❌ Subscription cron failed:', err));
   });

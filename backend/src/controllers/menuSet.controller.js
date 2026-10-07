@@ -7,11 +7,12 @@ const { recalculateMenuSetCost } = require('../services/costing.service');
 async function assertDishesOwnedByChef(chefId, dishIds) {
   const validCount = await prisma.dish.count({ where: { id: { in: dishIds }, chefId } });
   if (validCount !== dishIds.length) {
-    throw ApiError.badRequest('One or more dishes do not belong to you or do not exist', [], { code: 'MENU_SET_DISHES_INVALID' });
+    throw ApiError.badRequest('One or more dishes do not belong to you or do not exist', [], {
+      code: 'MENU_SET_DISHES_INVALID',
+    });
   }
 }
 
-// US-45: Create Menu Set
 const createMenuSet = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { name, dishIds } = req.body;
@@ -30,7 +31,6 @@ const createMenuSet = asyncHandler(async (req, res) => {
   return new ApiResponse(201, fullMenuSet, 'Menu set created successfully').send(res);
 });
 
-// List Menu Sets
 const getMenuSets = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { archived } = req.query;
@@ -43,7 +43,6 @@ const getMenuSets = asyncHandler(async (req, res) => {
   return new ApiResponse(200, menuSets, 'Menu sets fetched successfully').send(res);
 });
 
-// US-46: View Menu Set Detail with dishes + total cost
 const getMenuSetDetail = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { id } = req.params;
@@ -79,7 +78,6 @@ const getMenuSetDetail = asyncHandler(async (req, res) => {
   ).send(res);
 });
 
-// US-47: Customize Existing Menu Set (replace full dish list, preserving order)
 const updateMenuSet = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { id } = req.params;

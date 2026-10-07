@@ -8,7 +8,6 @@ function uploadAvatarBuffer(buffer, chefId) {
         public_id: chefId,
         overwrite: true,
         resource_type: 'image',
-        // Auto-resize + auto-compress (US-07 Technical Note)
         transformation: [
           { width: 512, height: 512, crop: 'fill', gravity: 'face' },
           { quality: 'auto', fetch_format: 'auto' },

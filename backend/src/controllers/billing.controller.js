@@ -6,7 +6,7 @@ const { createPdfDocument, writeInvoicePdf } = require('../services/pdf.service'
 
 const VALID_TRANSACTION_STATUSES = ['PENDING', 'SUCCESS', 'FAILED', 'REFUNDED'];
 
-// US-22: View Transaction History (Scenario 1, 2, 3, 4 — list, empty state, filter, pagination)
+// US-22: View Transaction History (list, empty state, filter, pagination)
 const getTransactionHistory = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
 
@@ -14,8 +14,6 @@ const getTransactionHistory = asyncHandler(async (req, res) => {
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
   const skip = (page - 1) * limit;
 
-  // Unknown/invalid status values are simply ignored (no filter applied) rather than erroring —
-  // consistent with how other query filters (archived, tag) are handled elsewhere in this API.
   const status = VALID_TRANSACTION_STATUSES.includes(req.query.status) ? req.query.status : undefined;
 
   const where = { chefId, status };

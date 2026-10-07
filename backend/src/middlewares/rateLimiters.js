@@ -18,23 +18,20 @@ function buildLimiter({ windowMs, max, code }) {
   });
 }
 
-// US-02 Technical Note: rate limit registration per IP/device
 const registerLimiter = buildLimiter({
-  windowMs: 60 * 60 * 1000, // 1 hour
+  windowMs: 60 * 60 * 1000,
   max: 5,
   code: 'AUTH_REGISTER_RATE_LIMITED',
 });
 
-// US-05 Technical Note: rate limit login attempts per IP (in addition to per-account lockout)
 const loginLimiter = buildLimiter({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 10,
   code: 'AUTH_LOGIN_RATE_LIMITED',
 });
 
-// Defense-in-depth per-IP layer, on top of the per-account 3-in-10-min limit in the controller
 const resendOtpLimiter = buildLimiter({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 10,
   code: 'AUTH_RESEND_RATE_LIMITED',
 });

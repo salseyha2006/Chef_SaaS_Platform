@@ -4,7 +4,6 @@ const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 const { buildShoppingListWithPurchaseStatus } = require('../services/shoppingList.service');
 
-// GET shopping list with purchased checkbox + progress bar data
 const getShoppingListWithStatus = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { eventId } = req.params;
@@ -28,7 +27,7 @@ const getShoppingListWithStatus = asyncHandler(async (req, res) => {
   ).send(res);
 });
 
-// US-60: Mark Items as Purchased (Check-off) — toggle single ingredient
+// US-60: Mark Items as Purchased — ownership-checked via ChefIngredient (not the old global Ingredient)
 const togglePurchased = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { eventId, chefIngredientId } = req.params;
@@ -37,7 +36,6 @@ const togglePurchased = asyncHandler(async (req, res) => {
   const event = await prisma.event.findUnique({ where: { id: eventId } });
   if (!event || event.chefId !== chefId) throw ApiError.notFound('Event not found', { code: 'EVENT_NOT_FOUND' });
 
-  // Ownership check — a chef must not be able to toggle another chef's ingredient by guessing its id
   const chefIngredient = await prisma.chefIngredient.findUnique({ where: { id: chefIngredientId } });
   if (!chefIngredient || chefIngredient.chefId !== chefId) {
     throw ApiError.notFound('Ingredient not found', { code: 'INGREDIENT_NOT_FOUND' });

@@ -56,13 +56,12 @@ function createPdfDocument() {
   return doc;
 }
 
-// Guards against float noise (e.g. 0.1 + 0.2) leaking into the PDF as long decimals
 function formatQuantity(value) {
   return Number(Number(value).toFixed(3)).toString();
 }
 
 function formatDate(date) {
-  return new Date(date).toISOString().slice(0, 10); // YYYY-MM-DD (language neutral)
+  return new Date(date).toISOString().slice(0, 10);
 }
 
 // US-58: name + quantity ONLY. Price must never appear here (business secret).
@@ -104,7 +103,6 @@ function writePurchasingListPdf(doc, { title, event, items, language }) {
       doc.heightOfString(qtyText, { width: qtyWidth, align: 'right' })
     );
 
-    // Manual page-break check: pdfkit doesn't repeat table headers automatically
     if (doc.y + rowHeight > pageBottom()) {
       doc.addPage();
       drawHeader();
@@ -120,8 +118,7 @@ function writePurchasingListPdf(doc, { title, event, items, language }) {
 function writeInvoicePdf(doc, { transaction, language }) {
   const L = getLabels(language);
 
-  // US-24 Scenario 2: use the snapshot taken at charge time, never the chef's current BillingInfo —
-  // so old invoices never change if the chef edits their billing info later.
+  // US-24 Scenario 2: use the snapshot taken at charge time, never the chef's current BillingInfo
   const billingName = transaction.billingNameSnapshot || transaction.chef.displayName || transaction.chef.email;
   const shopAddress = transaction.shopAddressSnapshot;
 
@@ -140,7 +137,6 @@ function writeInvoicePdf(doc, { transaction, language }) {
 }
 
 // Generic buffer-mode wrapper — used when a PDF is needed in-memory (e.g. as an email attachment)
-// rather than streamed straight to an HTTP response.
 function generatePdfBuffer(writeFn, options) {
   return new Promise((resolve, reject) => {
     const doc = createPdfDocument();

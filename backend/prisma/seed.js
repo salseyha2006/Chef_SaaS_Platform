@@ -14,6 +14,7 @@ const units = [
   { name: 'Clove', abbreviation: 'clove', unitType: 'count', conversionRate: 1 },
 ];
 
+// Top-level categories (no parent)
 const categories = [
   'Meat',
   'Seafood',
@@ -25,10 +26,18 @@ const categories = [
   'Grain & Noodle',
 ];
 
+// US-31 Technical Note: Category → Sub Category example hierarchy
+const subCategories = [
+  { name: 'Chicken', parent: 'Meat' },
+  { name: 'Pork', parent: 'Meat' },
+  { name: 'Beef', parent: 'Meat' },
+];
+
 const ingredients = [
-  { name: 'Pork Belly', category: 'Meat', unit: 'Kilogram' },
-  { name: 'Chicken Breast', category: 'Meat', unit: 'Kilogram' },
-  { name: 'Beef Shank', category: 'Meat', unit: 'Kilogram' },
+  // Meat — filed under their specific sub-category instead of the flat "Meat" parent
+  { name: 'Pork Belly', category: 'Pork', unit: 'Kilogram' },
+  { name: 'Chicken Breast', category: 'Chicken', unit: 'Kilogram' },
+  { name: 'Beef Shank', category: 'Beef', unit: 'Kilogram' },
   { name: 'Shrimp', category: 'Seafood', unit: 'Kilogram' },
   { name: 'Squid', category: 'Seafood', unit: 'Kilogram' },
   { name: 'Fish Sauce', category: 'Sauce & Condiment', unit: 'Liter' },
@@ -52,17 +61,13 @@ async function main() {
   for (const u of units) {
     const created = await prisma.unit.upsert({
       where: { name: u.name },
-      update: {
-        abbreviation: u.abbreviation,
-        unitType: u.unitType,
-        conversionRate: u.conversionRate,
-      },
+      update: { abbreviation: u.abbreviation, unitType: u.unitType, conversionRate: u.conversionRate },
       create: u,
     });
     unitMap[u.name] = created.id;
   }
 
-  console.log('🌱 Seeding categories...');
+  console.log('🌱 Seeding top-level categories...');
   const categoryMap = {};
   for (const name of categories) {
     const created = await prisma.category.upsert({
@@ -73,14 +78,21 @@ async function main() {
     categoryMap[name] = created.id;
   }
 
+  console.log('🌱 Seeding sub-categories...');
+  for (const sub of subCategories) {
+    const created = await prisma.category.upsert({
+      where: { name: sub.name },
+      update: { parentId: categoryMap[sub.parent] },
+      create: { name: sub.name, parentId: categoryMap[sub.parent] },
+    });
+    categoryMap[sub.name] = created.id;
+  }
+
   console.log('🌱 Seeding ingredients...');
   for (const ing of ingredients) {
     await prisma.ingredient.upsert({
       where: { name: ing.name },
-      update: {
-        categoryId: categoryMap[ing.category],
-        defaultUnitId: unitMap[ing.unit],
-      },
+      update: { categoryId: categoryMap[ing.category], defaultUnitId: unitMap[ing.unit] },
       create: {
         name: ing.name,
         categoryId: categoryMap[ing.category],

@@ -57,7 +57,6 @@ const getPendingRefundRequests = asyncHandler(async (req, res) => {
 // Admin US-25 Scenario 3: Approve — calls the gateway refund API automatically
 const approveRefund = asyncHandler(async (req, res) => {
   const { transactionId } = req.params;
-  const adminId = req.headers['x-admin-secret']; // stub: no real admin identity yet, see requireAdminSecret
 
   const transaction = await prisma.transaction.findUnique({
     where: { id: transactionId },
@@ -91,12 +90,11 @@ const approveRefund = asyncHandler(async (req, res) => {
       data: {
         status: 'REFUNDED',
         refundStatus: 'APPROVED',
-        refundReviewedBy: 'admin', // stub — replace with real admin identity once admin auth exists
+        refundReviewedBy: 'admin',
         refundReviewedAt: new Date(),
       },
     });
 
-    // US-25 Technical Note: sync subscription access — a refunded cycle should not keep access active
     if (
       transaction.subscriptionId &&
       transaction.subscription &&

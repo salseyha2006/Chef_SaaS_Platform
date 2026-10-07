@@ -19,7 +19,6 @@ const upload = multer({
   },
 });
 
-// Wraps multer's own errors (e.g. file too large) into our standard ApiError/code format
 function handleAvatarUpload(req, res, next) {
   upload.single('avatar')(req, res, (err) => {
     if (err instanceof multer.MulterError) {
@@ -30,7 +29,7 @@ function handleAvatarUpload(req, res, next) {
       }
       return next(ApiError.badRequest(err.message, [], { code: 'AVATAR_UPLOAD_ERROR' }));
     }
-    if (err) return next(err); // ApiError thrown from fileFilter above
+    if (err) return next(err);
     next();
   });
 }

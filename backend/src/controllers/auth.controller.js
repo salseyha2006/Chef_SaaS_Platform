@@ -11,11 +11,11 @@ const { verifyGoogleIdToken } = require('../utils/googleAuth');
 const { startTrialForChef } = require('../services/subscription.service');
 const { uploadAvatarBuffer } = require('../services/upload.service');
 
-const RESEND_WINDOW_MINUTES = 10;
-const RESEND_MAX_ATTEMPTS = 3;
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCK_DURATION_MINUTES = 15;
 const REFRESH_TOKEN_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const RESEND_WINDOW_MINUTES = 10;
+const RESEND_MAX_ATTEMPTS = 3;
 
 async function issueTokensAndSetCookie(chef, res) {
   const accessToken = signAccessToken({ id: chef.id, email: chef.email });
@@ -62,8 +62,6 @@ const register = asyncHandler(async (req, res) => {
 
   await startTrialForChef(chef.id); // US-12
 
-  // Fire-and-forget: don't block the response on a slow SMTP provider.
-  // If delivery fails, the chef can request a new code via POST /auth/resend-otp (Step 2).
   sendOtpEmail(email, otp, 'verification', chef.language).catch((err) =>
     console.error('Failed to send verification OTP email:', err)
   );
@@ -167,19 +165,20 @@ const verifyEmail = asyncHandler(async (req, res) => {
 // US-04 Scenario 3/4: Resend Email Verification OTP (max 3 times per 10 minutes, per account)
 const resendOtp = asyncHandler(async (req, res) => {
   const { email } = req.body;
+
   const chef = await prisma.chef.findUnique({ where: { email } });
-  
   if (!chef) throw ApiError.notFound('Account not found', { code: 'AUTH_ACCOUNT_NOT_FOUND' });
   if (chef.isEmailVerified) {
     throw ApiError.badRequest('Email is already verified', [], { code: 'AUTH_EMAIL_ALREADY_VERIFIED' });
   }
-  
+
   const now = new Date();
   const windowExpired =
     !chef.emailOtpResendWindowStart ||
     now - chef.emailOtpResendWindowStart > RESEND_WINDOW_MINUTES * 60 * 1000;
+
   const currentCount = windowExpired ? 0 : chef.emailOtpResendCount;
-  
+
   if (currentCount >= RESEND_MAX_ATTEMPTS) {
     const minutesLeft = Math.max(
       1,
@@ -192,8 +191,9 @@ const resendOtp = asyncHandler(async (req, res) => {
       params: { minutes: minutesLeft },
     });
   }
-  
+
   const otp = generateOtp();
+
   await prisma.chef.update({
     where: { id: chef.id },
     data: {
@@ -203,11 +203,11 @@ const resendOtp = asyncHandler(async (req, res) => {
       emailOtpResendWindowStart: windowExpired ? now : chef.emailOtpResendWindowStart,
     },
   });
-  
+
   sendOtpEmail(email, otp, 'verification', chef.language).catch((err) =>
     console.error('Failed to send verification OTP email:', err)
   );
-  
+
   return new ApiResponse(200, null, 'A new verification code has been sent to your email').send(res);
 });
 
@@ -230,7 +230,6 @@ const login = asyncHandler(async (req, res) => {
     });
   }
 
-  // Bug fix: a lock that has already expired means failed attempts start counting from 0 again
   const baseFailedCount = lockExpired ? 0 : chef.failedLoginCount;
 
   const isPasswordValid = await bcrypt.compare(password, chef.password);
@@ -263,7 +262,6 @@ const login = asyncHandler(async (req, res) => {
     data: { failedLoginCount: 0, lockedUntil: null },
   });
 
-  // US-02 Technical Note: block login until the email is verified
   if (!chef.isEmailVerified) {
     throw ApiError.forbidden('Please verify your email before logging in', {
       code: 'AUTH_EMAIL_NOT_VERIFIED',
@@ -300,7 +298,6 @@ const forgotPassword = asyncHandler(async (req, res) => {
       where: { id: chef.id },
       data: { resetOtp: hashOtp(otp), resetOtpExpiresAt: getOtpExpiry() },
     });
-    // Fire-and-forget: keep response time identical whether or not the email exists
     sendOtpEmail(email, otp, 'reset', chef.language).catch((err) =>
       console.error('Failed to send reset OTP email:', err)
     );
@@ -338,7 +335,6 @@ const resetPassword = asyncHandler(async (req, res) => {
     },
   });
 
-  // US-06 Technical Note: invalidate every existing session/token after a password reset
   await prisma.refreshToken.deleteMany({ where: { chefId: chef.id } });
 
   return new ApiResponse(200, null, 'Password has been reset successfully').send(res);
@@ -372,14 +368,14 @@ const changePassword = asyncHandler(async (req, res) => {
   return new ApiResponse(200, null, 'Password updated successfully').send(res);
 });
 
-// US-07: Update Own Profile (name / language only — avatar has its own endpoint)
+// US-07: Update Own Profile (name / language / view mode — avatar has its own endpoint)
 const updateProfile = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
-  const { displayName, language } = req.body;
+  const { displayName, language, dishViewMode } = req.body;
 
   const chef = await prisma.chef.update({
     where: { id: chefId },
-    data: { displayName, language },
+    data: { displayName, language, dishViewMode },
   });
 
   return new ApiResponse(
@@ -390,12 +386,13 @@ const updateProfile = asyncHandler(async (req, res) => {
       displayName: chef.displayName,
       avatarUrl: chef.avatarUrl,
       language: chef.language,
+      dishViewMode: chef.dishViewMode,
     },
     'Profile updated successfully'
   ).send(res);
 });
 
-// US-07 Scenario 1/2: Upload / replace avatar (multer already validated size + type)
+// US-07 Scenario 1/2: Upload / replace avatar
 const uploadAvatar = asyncHandler(async (req, res) => {
   if (!req.file) {
     throw ApiError.badRequest('No image file was provided', [], { code: 'AVATAR_FILE_REQUIRED' });
@@ -458,6 +455,7 @@ const getMe = asyncHandler(async (req, res) => {
       displayName: true,
       avatarUrl: true,
       language: true,
+      dishViewMode: true,
       isEmailVerified: true,
       authProvider: true,
       hasCompletedOnboarding: true,

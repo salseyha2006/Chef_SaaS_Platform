@@ -4,7 +4,6 @@ function requireAdminSecret(req, res, next) {
   const secret = req.headers['x-admin-secret'];
 
   if (!process.env.ADMIN_SECRET) {
-    // Fail closed: never allow admin access if the operator forgot to configure the secret
     return next(ApiError.internal('Admin access is not configured on this server'));
   }
 

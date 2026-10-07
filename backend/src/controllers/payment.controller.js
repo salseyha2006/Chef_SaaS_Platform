@@ -59,7 +59,7 @@ const retryPayment = asyncHandler(async (req, res) => {
     const endDate = new Date(Date.now() + plan.durationDays * 24 * 60 * 60 * 1000);
     await prisma.subscription.update({
       where: { id: oldTransaction.subscriptionId },
-      data: { status: 'ACTIVE', endDate, retryCount: 0 }, // resolved — reset the retry counter
+      data: { status: 'ACTIVE', endDate, retryCount: 0 },
     });
   }
 

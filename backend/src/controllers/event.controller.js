@@ -4,7 +4,6 @@ const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 const { buildShoppingList } = require('../services/shoppingList.service');
 
-// US-50: Create Event
 const createEvent = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { name, eventDate, tableCount } = req.body;
@@ -64,7 +63,6 @@ const updateEvent = asyncHandler(async (req, res) => {
   return new ApiResponse(200, updated, 'Event updated successfully').send(res);
 });
 
-// US-51: Clone / Duplicate Event
 const cloneEvent = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { id } = req.params;
@@ -99,7 +97,6 @@ const cloneEvent = asyncHandler(async (req, res) => {
   return new ApiResponse(201, clone, 'Event cloned successfully').send(res);
 });
 
-// US-52: Add Dishes / Menu Set to Event
 const addItemsToEvent = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { id } = req.params;
@@ -158,7 +155,6 @@ const removeMenuSetFromEvent = asyncHandler(async (req, res) => {
   return new ApiResponse(200, null, 'Menu set removed from event').send(res);
 });
 
-// US-53: View Event Cost Calculation (Auto-Shopping List)
 const getEventCostCalculation = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { id } = req.params;

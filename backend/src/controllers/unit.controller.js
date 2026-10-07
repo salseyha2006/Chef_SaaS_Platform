@@ -3,14 +3,13 @@ const ApiError = require('../utils/ApiError');
 const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 
-// Browse the global Unit preset catalog, flagged with whether this chef already imported each one
 const getUnitPresets = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
 
   const [presets, imported] = await Promise.all([
     prisma.unit.findMany({ orderBy: { name: 'asc' } }),
     prisma.chefUnit.findMany({
-      where: { chefId, sourcePresetId: { not: null } },
+      where: { chefId, sourcePresetId: { not: null }, isActive: true },
       select: { sourcePresetId: true },
     }),
   ]);
@@ -29,22 +28,18 @@ const getUnitPresets = asyncHandler(async (req, res) => {
   return new ApiResponse(200, data, 'Unit presets fetched successfully').send(res);
 });
 
-// US-26: this chef's own Units (custom + imported copies) — used to populate forms elsewhere
 const getMyUnits = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
-
   const units = await prisma.chefUnit.findMany({
     where: { chefId, isActive: true },
     orderBy: { name: 'asc' },
   });
-
   return new ApiResponse(200, units, 'Your units fetched successfully').send(res);
 });
 
-// US-26 + US-27: Create a brand-new custom Unit (conversionRate mandatory)
 const createUnit = asyncHandler(async (req, res) => {
-  const chefId = req.chef.id;
   const { name, abbreviation, unitType, conversionRate } = req.body;
+  const chefId = req.chef.id;
 
   const existing = await prisma.chefUnit.findUnique({ where: { chefId_name: { chefId, name } } });
   if (existing) throw ApiError.conflict('You already have a unit with this name', { code: 'UNIT_EXISTS' });
@@ -56,7 +51,7 @@ const createUnit = asyncHandler(async (req, res) => {
   return new ApiResponse(201, unit, 'Unit created successfully').send(res);
 });
 
-// US-26 + US-29: Import (copy) a preset Unit into this chef's own list
+// US-29 Scenario 3: reactivate an archived import instead of failing on the unique constraint
 const importUnitPreset = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { presetId } = req.params;
@@ -67,10 +62,35 @@ const importUnitPreset = asyncHandler(async (req, res) => {
   const existing = await prisma.chefUnit.findUnique({
     where: { chefId_sourcePresetId: { chefId, sourcePresetId: presetId } },
   });
+
   if (existing) {
-    throw ApiError.conflict('This unit preset has already been imported', {
-      code: 'UNIT_ALREADY_IMPORTED',
+    if (existing.isActive) {
+      throw ApiError.conflict('This unit preset has already been imported', {
+        code: 'UNIT_ALREADY_IMPORTED',
+      });
+    }
+
+    const nameClash = await prisma.chefUnit.findFirst({
+      where: { chefId, name: preset.name, NOT: { id: existing.id } },
     });
+    if (nameClash) {
+      throw ApiError.conflict(
+        "You already have a different unit using this preset's name — rename or remove it before re-importing",
+        { code: 'UNIT_EXISTS' }
+      );
+    }
+
+    const reactivated = await prisma.chefUnit.update({
+      where: { id: existing.id },
+      data: {
+        isActive: true,
+        name: preset.name,
+        abbreviation: preset.abbreviation,
+        unitType: preset.unitType,
+        conversionRate: preset.conversionRate,
+      },
+    });
+    return new ApiResponse(201, reactivated, 'Unit imported to your list successfully').send(res);
   }
 
   const unit = await prisma.chefUnit.create({
@@ -88,8 +108,6 @@ const importUnitPreset = asyncHandler(async (req, res) => {
   return new ApiResponse(201, unit, 'Unit imported to your list successfully').send(res);
 });
 
-// US-11 Scenario 3: Edit a unit this chef owns (imported-from-preset or fully custom) —
-// never touches the global preset row, so other chefs are unaffected
 const updateUnit = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { id } = req.params;
@@ -113,13 +131,24 @@ const updateUnit = asyncHandler(async (req, res) => {
   return new ApiResponse(200, updated, 'Unit updated successfully').send(res);
 });
 
-// US-30 / US-11 Scenario 3 (delete): soft-delete — hides it from this chef's list only
+// US-30 Scenario 3 (Optional Guard): warn if ingredients actively use this unit; ?force=true to proceed
 const archiveUnit = asyncHandler(async (req, res) => {
   const chefId = req.chef.id;
   const { id } = req.params;
+  const force = req.query.force === 'true';
 
   const unit = await prisma.chefUnit.findUnique({ where: { id } });
   if (!unit || unit.chefId !== chefId) throw ApiError.notFound('Unit not found', { code: 'UNIT_NOT_FOUND' });
+
+  if (!force) {
+    const usageCount = await prisma.chefIngredient.count({ where: { unitId: id, isActive: true } });
+    if (usageCount > 0) {
+      throw ApiError.conflict(
+        `This unit is used by ${usageCount} ingredient(s) in your stock. Add ?force=true to archive anyway.`,
+        { code: 'UNIT_IN_USE_CONFIRM_REQUIRED', params: { count: usageCount } }
+      );
+    }
+  }
 
   const updated = await prisma.chefUnit.update({ where: { id }, data: { isActive: false } });
 

@@ -44,7 +44,7 @@ async function buildShoppingList(eventId) {
   if (!result) return null;
   const { event, dishes } = result;
 
-  const grouped = {}; // key: ChefIngredient.id (unique per chef, so it's the correct grouping key now)
+  const grouped = {}; // key: ChefIngredient.id
 
   for (const dish of dishes) {
     for (const di of dish.ingredients) {

@@ -6,7 +6,6 @@ const { chargeSubscription, getSubscriptionEndDate } = require('../services/subs
 const { generateInvoicePdfBuffer } = require('../services/pdf.service');
 const { sendReceiptEmail } = require('../services/email.service');
 
-// Fire-and-forget: never block the API response on a slow SMTP provider
 async function sendReceiptEmailInBackground(chef, plan, transaction) {
   try {
     const invoiceData = { ...transaction, plan, chef };
@@ -47,7 +46,6 @@ const getMySubscription = asyncHandler(async (req, res) => {
   ).send(res);
 });
 
-// US-14 + US-18 + US-19 + US-21: Upgrade / Start Paid Subscription
 // US-14 + US-18 + US-19 + US-21: Upgrade / Start Paid Subscription
 const upgradeSubscription = asyncHandler(async (req, res) => {
   const { planId, paymentMethod, savedPaymentMethodId } = req.body;
@@ -97,7 +95,11 @@ const upgradeSubscription = asyncHandler(async (req, res) => {
 
   sendReceiptEmailInBackground(chef, plan, transaction);
 
-  return new ApiResponse(200, { subscription, transaction }, 'Subscription upgraded and payment confirmed successfully').send(res);
+  return new ApiResponse(
+    200,
+    { subscription, transaction },
+    'Subscription upgraded and payment confirmed successfully'
+  ).send(res);
 });
 
 // US-16 Scenario 1: Cancel Subscription (Auto-renewal)

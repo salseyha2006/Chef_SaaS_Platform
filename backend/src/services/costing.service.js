@@ -1,16 +1,34 @@
 const prisma = require('../config/db');
+const { convertUnit } = require('../utils/unitConversion');
+
+// US-37 Technical Note: if this recipe line specifies its own unit (different from the
+// ChefIngredient's stocked unit), convert quantityUsed into the stocked unit first —
+// purchasePrice is always per stocked-unit, so costing must happen in that unit.
+function getEffectiveQuantity(dishIngredient) {
+  const { quantityUsed, unit: lineUnit, chefIngredient } = dishIngredient;
+
+  if (!lineUnit || lineUnit.id === chefIngredient.unit.id) {
+    return quantityUsed;
+  }
+
+  return convertUnit(
+    { unitType: lineUnit.unitType, conversionRate: lineUnit.conversionRate },
+    { unitType: chefIngredient.unit.unitType, conversionRate: chefIngredient.unit.conversionRate },
+    quantityUsed
+  );
+}
 
 // US-42: Recalculate a single Dish's total cost from its current ingredients
 async function recalculateDishCost(dishId) {
   const dishIngredients = await prisma.dishIngredient.findMany({
     where: { dishId },
-    include: { chefIngredient: true },
+    include: { chefIngredient: { include: { unit: true } }, unit: true },
   });
 
-  const totalCost = dishIngredients.reduce(
-    (sum, di) => sum + di.quantityUsed * di.chefIngredient.purchasePrice,
-    0
-  );
+  const totalCost = dishIngredients.reduce((sum, di) => {
+    const effectiveQuantity = getEffectiveQuantity(di);
+    return sum + effectiveQuantity * di.chefIngredient.purchasePrice;
+  }, 0);
 
   await prisma.dish.update({ where: { id: dishId }, data: { totalCost } });
 
@@ -25,7 +43,7 @@ async function recalculateDishCost(dishId) {
   return totalCost;
 }
 
-// US-42: When an ingredient's price changes (Epic 8), recalc every Dish using it
+// US-42: When an ingredient's price (or unit) changes (Epic 8), recalc every Dish using it
 async function recalculateDishesUsingChefIngredient(chefIngredientId) {
   const links = await prisma.dishIngredient.findMany({
     where: { chefIngredientId },
@@ -54,4 +72,5 @@ module.exports = {
   recalculateDishCost,
   recalculateDishesUsingChefIngredient,
   recalculateMenuSetCost,
+  getEffectiveQuantity,
 };

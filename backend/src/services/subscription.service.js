@@ -35,8 +35,6 @@ async function startTrialForChef(chefId) {
 
 // US-19 / US-20: Attempt to charge a chef for a given plan and record the transaction.
 // Optionally charges a previously saved card (US-18 Scenario 2) instead of a fresh one.
-// US-19 / US-20: Attempt to charge a chef for a given plan and record the transaction.
-// Optionally charges a previously saved card (US-18 Scenario 2) instead of a fresh one.
 async function chargeSubscription({
   chef,
   plan,
