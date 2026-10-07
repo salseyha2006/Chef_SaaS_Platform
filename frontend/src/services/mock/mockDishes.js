@@ -181,4 +181,21 @@ export const mockDishes = {
     dishes = dishes.filter((d) => d.id !== id);
     return null;
   },
+
+  /** (Mock ប៉ុណ្ណោះ — មិនមែន Endpoint) ទាញ Dish តាម id ទាំង Archived ដើម្បីគណនា MenuSet. រក្សាលំដាប់ ids */
+  async _peek(ids) {
+    const stock = await mockIngredients.stock();
+    return ids
+      .map((id) => dishes.find((d) => d.id === id))
+      .filter(Boolean)
+      .map((d) => toRaw(d, stock));
+  },
+
+  /** (Mock ប៉ុណ្ណោះ) បន្ទាត់គ្រឿងផ្សំរបស់ Dish តាម ids (ទាំង Archived) សម្រាប់គណនា Cost ក្នុង Event */
+  async _lines(ids) {
+    return ids
+      .map((id) => dishes.find((d) => d.id === id))
+      .filter(Boolean)
+      .flatMap((d) => d.lines.map((l) => ({ dishId: d.id, chefIngredientId: l.chefIngredientId, quantityUsed: l.quantityUsed })));
+  },
 };

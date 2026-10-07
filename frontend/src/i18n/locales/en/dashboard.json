@@ -1,0 +1,35 @@
+{
+  "greeting": "Hello {{name}}",
+  "retry": "Try again",
+  "stats": {
+    "title": "Summary",
+    "eventsMonth": "Events this month",
+    "spendingMonth": "Spending this month",
+    "dishes": "Total dishes",
+    "menuSets": "Menu sets"
+  },
+  "upcoming": {
+    "title": "Upcoming events",
+    "viewAll": "View all",
+    "none": "No upcoming events",
+    "create": "Create event",
+    "empty": "You don't have any events yet",
+    "emptyCta": "Create your first event"
+  },
+  "shortcuts": {
+    "title": "Shortcuts",
+    "stock": "Ingredient stock",
+    "dishes": "Dishes",
+    "menuSets": "Menu sets",
+    "events": "Events",
+    "catalog": "Units & categories settings"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "home": "Home",
+    "stock": "Stock",
+    "dishes": "Dishes",
+    "events": "Events",
+    "more": "More"
+  }
+}

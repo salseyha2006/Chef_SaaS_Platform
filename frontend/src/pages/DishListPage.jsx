@@ -115,7 +115,7 @@ export default function DishListPage() {
       <Link
         to="/dishes/new"
         aria-label={t('list.add')}
-        className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-5 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600 text-white shadow-btn active:bg-emerald-800"
+        className="fixed bottom-[max(calc(var(--bottom-nav-h,0px)_+_1.5rem),1.5rem,env(safe-area-inset-bottom))] right-5 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600 text-white shadow-btn active:bg-emerald-800"
       >
         <PlusIcon width={26} height={26} />
       </Link>

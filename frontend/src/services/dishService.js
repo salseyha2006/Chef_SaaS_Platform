@@ -21,7 +21,7 @@ async function getById(id) {
   return toDishDetail(data);
 }
 
-/** POST /dishes */
+/** POST /dishes {name, description?, imageUrl?, tags?, ingredients:[{chefIngredientId, quantityUsed}]} (400 DISH_INGREDIENTS_NOT_IN_STOCK) */
 async function create(body) {
   const data = USE_MOCK ? await mockDishes.create(body) : await api.post('/dishes', body);
   return toDish(data);

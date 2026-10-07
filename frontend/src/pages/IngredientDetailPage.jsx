@@ -113,7 +113,8 @@ export default function IngredientDetailPage() {
     try {
       await ingredientService.updateStock(id, patch);
       await load();
-      setToast('saved');
+      // US-42 / UX 9.5: តម្លៃផ្លាស់ប្តូរ → Backend Recalc ថ្លៃមុខម្ហូបដែលប្រើគ្រឿងផ្សំនេះ
+      setToast(patch.purchasePrice !== undefined ? 'savedRecalc' : 'saved');
     } catch (err) {
       const fe = getFieldErrors(err);
       if (fe) setErrors({ price: fe.purchasePrice, unit: fe.unitId });

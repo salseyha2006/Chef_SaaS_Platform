@@ -49,21 +49,32 @@ Legend: ⬜ មិនទាន់ · 🟡 Code ចប់ រង់ចាំ Test
 - 🟡 US-36 Delete (Modal ក្រហម, 409 INGREDIENT_IN_USE → Warning + "លាក់ជំនួស")
 - ⬜ US-26/28 Combobox ពេញលេញ (បច្ចុប្បន្ន <select> + Option បង្កើតថ្មី)
 
-## Epic 9 — Dish & Recipe
-- 🟡 US-43 S2 Filter តាម Tag (Chip ពី Dish ទាំងអស់, Filter Client-side) · ⬜ S1/S3 កំណត់/បង្កើត Tag (9B)
-- 🟡 US-44 Toggle List/Grid + ចងចាំ View (localStorage `chef.dishView`)
-- ⬜ US-37 · US-39 (9B) · ⬜ US-38 · US-40 · US-41 (9C) · ⬜ US-42 (9D) · ⬜ US-44.1 (9E — Backend Gap #65)
+## Epic 9 — Dish & Recipe (User Story: US-37..44.1)
+- ✅ 9A US-43 S2 Filter តាម Tag (Chip ពី Dish ទាំងអស់, Client-side) · US-44 Toggle List/Grid + ចងចាំ View (localStorage `chef.dishView`)
+- ✅ 9B US-37 Create (Live Cost ប៉ាន់ស្មាន, Validation ≥1 គ្រឿងផ្សំ / បរិមាណ > 0) · US-39 Edit (Replace-all, Cancel → Modal) · US-43 S1/S3 Tag (string សេរី) · Picker ពី Stock
+- ✅ 9C US-38 Detail + Cost Breakdown (% ពី Server, Highlight ខ្ពស់បំផុត) · US-40 Duplicate · US-41 Archive/Delete (409 DISH_IN_USE → "លាក់ជំនួស") · Tab សកម្ម/បានលាក់ · ⬜ Restore (Gap #63) · ⬜ Badge "Archived" លើគ្រឿងផ្សំ (Gap #71)
+- ✅ 9D US-42 Dynamic Costing: ទាញថ្មីរាល់ពេលចូល + Toast ក្រោយកែតម្លៃស្តុក (គ្មានលេខ N — Gap #75)
+- ⏸️ 9E US-44.1 Fixed Dish (`calculationType`) — ពន្យារពេល រង់ចាំ Backend (មើល `7_PENDING_BACKEND_9E.md`)
+- Route: `/dishes` · `/dishes/new` · `/dishes/:id` (Detail) · `/dishes/:id/edit`
 
-## Epic 9 — Dish & Recipe
-- 🟡 US-43 Tag: S1 កំណត់ Tag (TagPicker) · S2 Filter · S3 បង្កើត Tag ថ្មីភ្លាមៗ (Tag ជា string សេរី — Gap #61/#69)
-- 🟡 US-44 Toggle List/Grid + ចងចាំ View
-- 🟡 US-37 Create Dish (Live Cost ប៉ាន់ស្មាន, Validation គ្រឿងផ្សំ ≥1 / បរិមាណ > 0) · Picker ពី Stock
-- 🟡 US-39 Edit Dish (Replace-all, Cancel → Modal) — ផ្គូផ្គងតាមឈ្មោះ (Gap #66); Route `/dishes/:id` បណ្តោះអាសន្ន = Form
-- ⬜ US-38 · US-40 · US-41 (9C) · ⬜ US-42 (9D) · ⬜ US-44.1 (9E — Backend Gap #65)
-- 🟡 US-38 Dish Detail + Cost Breakdown (% ពី Server, Highlight ខ្ពស់បំផុត) · ⬜ S3 Badge "Archived" លើគ្រឿងផ្សំ (Gap #66/#71)
-- 🟡 US-40 Duplicate (បង្ហាញតាមឈ្មោះ Backend "(Copy)" — Gap #3) → ទៅ Detail ថ្មី + Toast
-- 🟡 US-41 S1 Archive (Confirm) · S2 មើលបញ្ជី Archived (Tab) ✅ · Restore ⬜ (Gap #63) · S3 Delete (409 DISH_IN_USE → Warning + "លាក់ជំនួស"; 400 INVALID_REFERENCE → "កំពុងប្រើ")
-- Route: `/dishes/:id` = Detail · `/dishes/:id/edit` = Form
+## Epic 10 — Menu Set (User Story: US-45..49)
+- ✅ 10A បញ្ជី (Tab សកម្ម/លាក់) · Detail · Archive · Delete
+- ✅ 10B US-45 Create (Validation ឈ្មោះ + ≥1 Dish, ការពារស្ទួន) · US-47 S1 Edit (Replace-all) · US-48 S3 Tap-to-add/✕ (Tab-switch តាម UX) · US-49 Sticky Total + Pulse (Client Σ)
+- ⚠️ US-48 S1/S2 Drag: ប្រើប៊ូតុង ▲▼ ជំនួស (មិនដំឡើង Library — Gap #85) · ⬜ US-47 S2 Snapshot (Backend — Gap #84) · US-46 S2 ពឹង Backend Recalc (Gap #83)
+- Route: `/menu-sets` · `/new` · `/:id` · `/:id/edit` (មិនមែន Tab ក្នុង Bottom Nav — ចូលតាម Dashboard)
+
+## Epic 11 — Event, Cost, Dashboard, Vendor, Report (User Story: US-50..59)
+- ✅ 11A US-50 បញ្ជី Event (Tab កំពុងមក/កន្លងទៅ/ទាំងអស់) · Create · Edit
+- ✅ 11B Event Detail (3 Tab) · US-52 បន្ថែម/ដក Dish & Menu Set (ការពារស្ទួនតែ Direct — Gap #94) · US-51 Clone (Sheet ឈ្មោះ + កាលបរិច្ឆេទថ្មី)
+- ✅ 11C US-53 Cost Calculation (Group តាម Category ១ Level; ទាញ my-stock ផ្គូផ្គងតាម id) · ⬜ Sub-Category (Gap #1)
+- ✅ 11D US-54 Dashboard (Event ខែនេះ គណនា Client — Gap #103) · ✅ 11D-2 BottomNavBar (5 Tab) លើ ៥ ទំព័រ Root (`MainTabsLayout`, `--bottom-nav-h`)
+- ✅ 11E US-55/56 Vendor Presets (Template Manager + Filter Client-side)
+- ✅ 11F-1 US-57 Quick Edit (Local State) + US-58 S1/S2 Preview A4 + PDF (ឈ្មោះ+បរិមាណ គ្មានតម្លៃ) · ⬜ US-58 S3 Telegram (Gap #116)
+- ✅ 11F-2 US-59 S1 Export Excel (Event តែមួយ) + S3 គ្មានទិន្នន័យ · ⬜ S2 ប្រចាំខែ + CSV (Gap #124/#125)
+- Route: `/events` · `/new` · `/:id` · `/:id/edit` · `/:id/report?template=` · `/:id/checklist`
+
+## Epic 12 — Procurement (User Story: US-60)
+- ✅ 12A US-60 Checklist: S1 គ្រីស → ឆូត/ព្រាល + រុញទៅក្រោមក្នុងក្រុម · S2 Undo · S3 Progress M/N + % (Frontend) · S4 ១០០% Toast + កាតបៃតង · S5 Persisted (Backend) · Optimistic + Rollback · Filter ទាំងអស់/មិនទាន់ទិញ
 
 ## Test Checklist (VITE_USE_MOCK=true)
 1. `/` ពេលមិនទាន់ Login → Redirect `/login`
@@ -131,39 +142,38 @@ Legend: ⬜ មិនទាន់ · 🟡 Code ចប់ រង់ចាំ Test
 63. Delete "សាច់មាន់ទាំងខ្លួន" (usedBy 2) → Modal បិទ + Warning លឿង "ប្រើក្នុង 2 មុខម្ហូប" → "លាក់ជំនួស" → Archive ជោគជ័យ
 64. Empty State: Archive/Delete ទាំង 4 → "មិនទាន់មានគ្រឿងផ្សំក្នុងស្តុក" + "បន្ថែមឥឡូវនេះ" → Browse
 65. `/ingredients/xyz` → "រកមិនឃើញគ្រឿងផ្សំនេះ"
-66. Home → "មុខម្ហូប" → /dishes: 4 ជួរ (Active) · Archived (សាឡាត់ត្រសក់) មិនបង្ហាញ · ថ្លៃ "$13.25"
-67. Chips: ទាំងអស់ · ស៊ុប · ម្ហូបសម្រន់ · ម្ហូបសំខាន់ · បង្អែម · ចុច "ម្ហូបសំខាន់" → 2 មុខ · ចុច "ទាំងអស់" ត្រឡប់
-68. Toggle Grid → 2 Column កាត (Placeholder 🍜 ព្រោះគ្មានរូប) · Refresh → នៅ Grid ដដែល · ប្តូរ List វិញ → ចងចាំ
-69. Console: localStorage.setItem('mock.dish','empty') + Refresh → Empty State + "បង្កើតមុខម្ហូបដំបូង"
-70. ប្តូរភាសា EN → ចំណងជើង/Toggle label/"Total cost" ប្តូរតាម
-71. FAB (+) / Empty CTA → /dishes/new (9B — ឥឡូវ Redirect ទៅ `/` ជាធម្មតា)
-72. /dishes → FAB (+) → "បង្កើតមុខម្ហូប": Save ទទេ → Error ឈ្មោះ + "សូមបន្ថែមគ្រឿងផ្សំ…" · Scroll ទៅលើ
-73. "+ បន្ថែមគ្រឿងផ្សំ" → Picker ពេញអេក្រង់: 4 ជួរ · Search/Chips ដំណើរការ · Footer "បានជ្រើសរើស (0)" ប៊ូតុង Disabled
-74. ជ្រើស 2 → "បន្ថែម →" → ត្រឡប់ Form ឃើញ 2 ជួរ · បើកម្តងទៀត → 2 នោះ checked+disabled "បានបន្ថែមរួចហើយ"
-75. បំពេញបរិមាណ `1.5` (សាច់មាន់ $6.50) → "= $9.75" ក្រោមជួរ · Footer សរុបប្តូរភ្លាម · ✕ ដកជួរ → សរុបថយ
-76. បរិមាណទទេ → Error "សូមបញ្ចូលបរិមាណ" · `0`/`-1` → "ធំជាង 0" · Save មិនបន្ត
-77. Tag: ចុច Chip ជ្រើស/ដក · វាយ "បុណ្យ" + Enter/"បន្ថែម" → Chip ថ្មីជ្រើសភ្លាម · វាយ "ស៊ុប" (មានស្រាប់) → មិនស្ទួន
-78. URL រូបភាព `abc` → Error "តំណមិនត្រឹមត្រូវ" (Mock 400) · ទទេ → ជាប់
-79. Save ត្រឹមត្រូវ → ត្រឡប់ /dishes + Toast "បានបង្កើតមុខម្ហូបថ្មី" · Dish ថ្មីក្នុងបញ្ជី ថ្លៃត្រូវ · Chip "បុណ្យ" ចេញ
-80. Back ពេលបានបំពេញ → Modal "បោះបង់?" → បោះបង់ត្រឡប់ List · Back ពេលទទេ → ត្រឡប់ភ្លាម
-81. ចុច Dish "ឆាក្ដៅសាច់មាន់" → Form Edit: ឈ្មោះ, Tag, 2 ជួរ (1.5 / 0.5) សរុប $10.75 · កែបរិមាណ → Save → Toast "បានរក្សាទុក" · List ថ្លៃថ្មី
-82. Edit → ដក 1 ជួរ + បន្ថែមមួយ → Save → ថ្លៃថ្មីត្រូវ (Replace-all) · Edit → ដកអស់ → Save → Error គ្រឿងផ្សំ
-83. Stock → Archive "ខ្ទឹមស" → Edit "ឆាក្ដៅសាច់មាន់" → Warning លឿង "ខ្ទឹមស … នឹងត្រូវដកចេញ" · /dishes/xyz → "រកមិនឃើញមុខម្ហូបនេះ"
-84. Stock ទទេ (Archive ទាំង 4) → Picker → "ស្តុកគ្រឿងផ្សំទទេ" + "ទៅបន្ថែមគ្រឿងផ្សំមុន" → /ingredients/browse
-85. `mock.sub=expired` + View-only → Save → 403 → Upgrade Modal (ពី api.js)
-86. /dishes → ចុច "ឆាក្ដៅសាច់មាន់" → Detail: ថ្លៃ $10.75 · Tag · តារាង 2 ជួរ (សាច់មាន់ 1.5kg $6.50 = $9.75 ៩០.៧%; ខ្ទឹមស 0.5kg $2.00 = $1.00) · ជួរសាច់មាន់ Highlight លឿង "ខ្ពស់បំផុត" · សរុបខាងក្រោម
-87. Detail មួយគ្រឿងផ្សំ (នំបញ្ចុក) → គ្មាន Highlight · Refresh ទំព័រ → ទិន្នន័យនៅដដែល · /dishes/xyz → "រកមិនឃើញមុខម្ហូបនេះ"
-88. Stock → កែតម្លៃ "សាច់មាន់" ទៅ $8 → Detail ឆាក្ដៅ → ថ្លៃថ្មី $13.00 (US-42 S2)
-89. "⋮" → កែប្រែ → /dishes/d-1/edit (Form) · Save → ត្រឡប់ Detail + Toast "បានរក្សាទុក" · Back ក្រោយនោះ មិនចូល Form វិញ
-90. Create Dish ថ្មី → Save → Detail ថ្មី + Toast "បានបង្កើត"
-91. "⋮" → Duplicate → Spinner ~0.6s → Detail "ឆាក្ដៅសាច់មាន់ (Copy)" + Toast "បានចម្លង" · ថ្លៃ/តារាងដូចដើម · កែ Copy → ដើមមិនប៉ះពាល់
-92. "⋮" → Archive → Modal → បញ្ជាក់ → /dishes + Toast "បានលាក់" · ជួរបាត់ពី Tab សកម្ម · Tab "បានលាក់" ឃើញ (រួម "សាឡាត់ត្រសក់")
-93. Tab "បានលាក់" → ចុចជួរ → Detail: Badge "បានលាក់" · Menu មានតែ "លុបចោល" · គ្មានប៊ូតុង កែប្រែ
-94. Delete "នំបញ្ចុក" → Modal ក្រហម → លុប → /dishes + Toast "បានលុប" · ជួរបាត់
-95. Delete "សម្លម្ជូរគ្រឿងសាច់ជ្រូក" (Mock ប្រើ 2 កញ្ចប់) → Modal បិទ + Warning លឿង "ប្រើក្នុង 2 កញ្ចប់ម៉ឺនុយ" → "លាក់ជំនួស" → Archive ជោគជ័យ
-96. Console: localStorage.setItem('mock.dishDelete','fk') → Delete Dish ណាមួយ (មិនជាប់ MenuSet) → Banner ក្រហម "មិនអាចបញ្ចប់បានទេ ព្រោះទិន្នន័យនេះកំពុងប្រើប្រាស់"
-97. Tab "បានលាក់" ទទេ (Archive/លុបអស់) → "មិនមានមុខម្ហូបដែលបានលាក់" គ្មានប៊ូតុងបង្កើត
-98. EN → Header ជួរតារាង, Modal, Toast ប្តូរភាសា
+
+### Epic 9–12 (Mock Seed: Dish d-1..d-5, MenuSet m-1..m-3, Event e-1..e-3 [Relative ទៅថ្ងៃនេះ], Template v-1/v-2)
+លេខខាងក្រោមជា Test សង្ខេបតាមជំហាន (ពិនិត្យតម្លៃ Seed: ឆាក្ដៅសាច់មាន់ $10.75 · នំបញ្ចុក $2.00 · បង្អែមចេកចៀន $1.00 · សម្លម្ជូរ $5.05 · កញ្ចប់មង្គលការ $16.80 · កញ្ចប់ធម្មតា $12.75)
+
+**Dish (9A–9D)**
+66. Home→/dishes: 4 ជួរ Active · "សាឡាត់ត្រសក់" (Archived) មិនបង្ហាញ · Chip Tag: ម្ហូបសំខាន់/ស៊ុប/ម្ហូបសម្រន់/បង្អែម · Filter ដំណើរការ
+67. Toggle Grid → 2 Column · Refresh → ចងចាំ Grid · `localStorage mock.dish=empty` → Empty State
+68. Create: Save ទទេ → Error ឈ្មោះ + គ្រឿងផ្សំ · Picker ជ្រើស 2 → បរិមាណ `1.5` → Footer Σ Live · `0`/ទទេ → Error · Tag ថ្មី Enter → Chip · URL `abc` → Error
+69. Save ត្រឹមត្រូវ → Dish Detail + Toast · Detail: Breakdown % + Highlight "ខ្ពស់បំផុត" ជួរសាច់មាន់
+70. Edit (⋮→កែប្រែ): ផ្គូផ្គងគ្រឿងផ្សំ · ដក/បន្ថែម → Save ថ្លៃថ្មី · Back ពេលកែ → Modal · Archive ខ្ទឹមស ក្នុង Stock → Warning លឿង
+71. Duplicate → "(Copy)" + Toast · Archive → Tab "បានលាក់" · Delete "សម្លម្ជូរ" → 409 Warning + "លាក់ជំនួស" · `mock.dishDelete=fk` → Banner
+72. Stock កែតម្លៃសាច់មាន់ 6.50→8 → Toast "ថ្លៃដើមមុខម្ហូបត្រូវបានធ្វើបច្ចុប្បន្នភាព" · ឆាក្ដៅ = $13.00 (US-42)
+
+**Menu Set (10A–10B)**
+73. /menu-sets: 2 ជួរ · ថ្លៃ = Σ Dish · Detail + Archive + Delete (`mock.menuSetDelete=fk`) · Tab "បានលាក់"
+74. Create: Tab-switch · "+" → "✓ បានបន្ថែម" (ការពារស្ទួន) · ▲▼✕ · Footer Pulse · Save ទទេ → Error · Edit Replace-all · Back → Modal
+
+**Event (11A–11F)**
+75. /events Tab កំពុងមក (e-1 +10, e-2 +35) / កន្លងទៅ (e-3) · Create Validation (ចំនួនតុ 0/-3/2.5) · Edit · Back → Modal
+76. Detail: Menu Set + Dish · Picker 2 Tab (មានរួច → ✓ Disabled) · ដក (Modal) · Clone Sheet (កាលបរិច្ឆេទទទេ → Error; ជោគជ័យ → Detail ថ្មី + Toast)
+77. Tab ការគណនា e-1 (20 តុ): **$255.00** · សាច់ $195.00 (30 kg) / បន្លែ $60.00 (30 kg) · e-2 (8 តុ): **$134.40** · សាច់ $118 → គ្រឿងទេស $8.40 → បន្លែ $8.00 · ប្តូរតុ 20→25 = **$318.75**
+78. Tab បញ្ជីទិញ: Template Dropdown (ទាំងអស់/ម៉ូយសាច់ 1/ម៉ូយបន្លែ 1/មិនក្នុង Template…) · Filter · បង្កើត/កែ/លុប Template · ឈ្មោះស្ទួន → Error
+79. "បង្កើត PDF" → /report?template=… Preview A4 (គ្មានតម្លៃ) · កែបរិមាណ/ថែម/ដក/Reset · ទទេ → Error · ទាញយក `purchasing-list-e-1.pdf` · `mock.reportPdf=fail` → Banner
+80. "នាំចេញ Excel" → Modal ព្រមានតម្លៃ → ទាញយក `cost-report-e-1.xlsx` (Mock ≠ Workbook ពិត) · Event ទទេ → Toast "គ្មានទិន្នន័យ" · `mock.reportExcel=fail`
+81. Dashboard "/": កាតស្ថិតិ (បើថ្ងៃនេះក្នុងខែដូច e-1: Event ខែនេះ 1 · ចំណាយ $255.00 · មុខម្ហូប 4 · កញ្ចប់ 2) · កម្មវិធីជិតមកដល់ 2 · `mock.event=empty` → Empty State
+
+**Checklist (12A)**
+82. Tab បញ្ជីទិញ → កាល "បានទិញ 0/2" → /checklist · ចុចជួរ → ✓ + ឆូត ភ្លាម · 50% · Undo · ១០០% → Toast + កាលបៃតង · Refresh → Persisted · `mock.togglePurchased=fail` → Rollback + Banner
+
+**Bottom Nav (11D-2)**
+83. ៥ Tab លើ "/", /ingredients, /dishes, /events, /profile · FAB នៅលើ Nav · Toast នៅលើ Nav · Detail/Form/Picker គ្មាន Nav · Touch + Focus Input → Nav លាក់ · /menu-sets គ្មាន Nav
+84. EN គ្រប់ទំព័រ · 360px មិនលើសអេក្រង់ · `mock.sub=expired` → Lockout ដូចដើម
 
 ## Backend Gaps
 1. Category គ្មាន Sub-category (`parentId`) — UX Epic 7/8/11 ត្រូវការ 2-level
@@ -225,21 +235,103 @@ Legend: ⬜ មិនទាន់ · 🟡 Code ចប់ រង់ចាំ Test
 57. `my-stock` ផ្តល់ `category` ជា String គ្មាន `categoryId`/`updatedAt`/`createdAt` → Detail ផ្គូផ្គងតាមឈ្មោះ; គ្មាន Sort "ថ្មីបំផុត"/"Last Updated"
 58. `PATCH my-stock/:id` មិនអាចលុប Category (categoryId optional uuid, គ្មាន null)
 59. `?categoryId=` ពេល Backend មាន Sub-category: មិនដឹងថា Parent រួម Item របស់ Sub ឬអត់ (ត្រូវបញ្ជាក់)
-60. GET /dishes = raw Prisma មិនបញ្ជាក់ field: Adapter `toDish` សន្មត់ `totalCost`, `tags[]`, `imageUrl`, `isArchived`; បើគ្មាន `totalCost` UI បង្ហាញ "—"
-61. គ្មាន Endpoint បញ្ជី Tag/Preset Tag (US-43 S3, Epic 1 i18n) → Chip បង្កើតពី Dish ទាំងអស់; Tag ដែលគ្មាន Dish ប្រើ មិនបង្ហាញ
-62. គ្មាន Endpoint Upload រូប Dish (មានតែ `imageUrl` ជា URL) → Grid View បង្ហាញ Placeholder; UX 9.2 "Photo upload" ធ្វើមិនបាន
+
+**Epic 9 (Dish)**
+60. GET /dishes raw មិនបញ្ជាក់ field → Adapter `toDish` សន្មត់ `totalCost`, `tags[]`, `imageUrl`, `isArchived`
+61. គ្មាន Endpoint បញ្ជី Tag/Preset Tag (US-43 S3) → Chip ពី Dish ទាំងអស់
+62. គ្មាន Upload រូប Dish (មាន `imageUrl` ជា URL) → បញ្ចូល URL ដោយដៃ
 63. គ្មាន Un-archive Dish (US-41 S2 Restore)
-64. `?tag=` គ្មានភ្ជាប់ Tag ច្រើន/Search; Frontend Filter Client-side (គ្មាន Pagination)
-65. `calculationType` (US-44.1) មិនមានក្នុង Contract/Dish — ត្រូវ Backend (schema + migration + Dish controller + Event cost-calculation)
-66. GET /dishes/:id `costBreakdown[]` គ្មាន `chefIngredientId` → Edit ផ្គូផ្គងតាមឈ្មោះក្នុង my-stock; គ្រឿងផ្សំ Archived/ប្តូរឈ្មោះ → ដកចេញពេល Save. ស្នើបន្ថែម `chefIngredientId` (+ `isArchived`) ក្នុង Breakdown (US-38 S3 ក៏ត្រូវការ Badge "Archived")
-67. PATCH /dishes/:id មិនអាចសម្អាត `description`/`imageUrl` (ទទេ → មិនផ្ញើ; imageUrl ត្រូវជា URL)
-68. Contract មិនបញ្ជាក់ `costBreakdown[].unit` (string/object) និង Path `errors[].field` របស់ Array (`ingredients.N.quantityUsed`) — Adapter ទទួលទាំងពីរ
-69. Tag គ្មាន Max length/Preset/Normalize ក្នុង Contract (US-43 + i18n Epic 1) — UI កំណត់ 40 តួ, ប្រៀបធៀបមិនប្រកាន់អក្សរធំតូច
-70. Total Cost Live ក្នុង Form ជាការប៉ាន់ស្មាន Client (Σ qty × purchasePrice) — គ្មាន Endpoint Preview; Backend ជា Source of Truth (US-37)
-71. US-38 S3: `costBreakdown[]` គ្មាន `isArchived` ក្នុង Row (ទាក់ទង #66) → Badge "Archived" ធ្វើមិនបាន; តារាងបង្ហាញឈ្មោះ/តម្លៃដូចធម្មតា
-72. Contract មិនបញ្ជាក់ថា `GET /dishes/:id` ឆ្លើយ Dish ដែល `isArchived:true` ឬអត់ → UI សន្មតថាបាន (Tab "បានលាក់" ចុចចូល Detail); បើ 404 → បង្ហាញ "រកមិនឃើញ"
-73. `DELETE /dishes/:id` ពិនិត្យតែ MenuSet (Contract §15.9); Dish ក្នុង Event ដែលជាប់ FK → 400 INVALID_REFERENCE (មិនមែន 409) → UI បង្ហាញសារទូទៅ "កំពុងប្រើប្រាស់" ដោយគ្មានចំនួន; ស្នើ 409 + count សម្រាប់ Event ផងដែរ (US-41 S3 តម្រូវពិនិត្យ Table Calculation ចាស់)
-74. Duplicate: Backend ពុំបញ្ជាក់ឈ្មោះជាន់ (Copy)(Copy) — UI បង្ហាញតាម Server
+64. `?tag=` មិនគាំទ្រ Tag ច្រើន/Search; Filter Client-side (គ្មាន Pagination)
+65. `calculationType` (US-44.1) មិនមានក្នុង Contract/Schema/Controller — ត្រូវ Backend (មើល `7_PENDING_BACKEND_9E.md`)
+66. `costBreakdown[]` គ្មាន `chefIngredientId` → Edit ផ្គូផ្គងតាមឈ្មោះ; ស្នើបន្ថែម `chefIngredientId` + `isArchived`
+67. PATCH /dishes/:id មិនអាចសម្អាត `description`/`imageUrl` (ទទេ → មិនផ្ញើ)
+68. Contract មិនបញ្ជាក់ `costBreakdown[].unit` (string/object) និង Path `errors[].field` របស់ Array
+69. Tag គ្មាន Max length/Preset/Normalize — UI កំណត់ 40 តួ, មិនប្រកាន់អក្សរធំតូច
+70. Total Cost Live ក្នុង Form ជាការប៉ាន់ស្មាន Client (Σ qty × purchasePrice); Backend ជា Source of Truth
+71. US-38 S3: គ្មាន `isArchived` ក្នុង Breakdown Row → គ្មាន Badge "Archived"
+72. Contract មិនបញ្ជាក់ថា GET /dishes/:id ឆ្លើយ Dish Archived ឬអត់ (UI សន្មតថាបាន)
+73. DELETE /dishes/:id ពិនិត្យតែ MenuSet; Event ជាប់ FK → 400 INVALID_REFERENCE (គ្មាន count) — ស្នើ 409 + count
+74. Duplicate ឈ្មោះ (Copy)(Copy) មិនបញ្ជាក់; UX "(ចម្លង)" vs Backend "(Copy)" (#3)
+75. PATCH my-stock/:id គ្មាន `affectedDishCount` → Toast US-42 ទូទៅ
+76. Schema `Dish.totalCost` ជា Column រក្សាទុក (មិនមែន Computed on Read) — ត្រូវបញ្ជាក់ថា Recalc គ្រប់ករណី
+
+**Epic 10 (Menu Set)**
+77. GET /menu-sets raw គ្មាន `dishCount`/`dishes` → បញ្ជីមិនបង្ហាញចំនួនមុខម្ហូប
+78. MenuSet raw មិនបញ្ជាក់ field (`totalCost`, `isArchived`)
+79. `dishes[].cost` ប្រភេទមិនបញ្ជាក់ (number/string)
+80. DELETE /menu-sets/:id មិនពិនិត្យ Event → 400 INVALID_REFERENCE (គ្មាន count)
+81. គ្មាន Un-archive MenuSet
+82. Dish Archived/លុប ក្នុងកញ្ចប់ — គ្មាន Flag
+83. US-46 Tech Note (Computed on Read) vs Schema `MenuSet.totalCost` Column — ត្រូវ Recalc គ្រប់ករណី
+84. US-47 S2 Snapshot: `EventMenuSet` ជា Live Reference — កែ MenuSet ប៉ះពាល់ Event ចាស់
+85. US-48 ណែនាំ `dnd-kit` តែហាមដំឡើង Library ដោយមិនសួរ → ▲▼ + Tap-to-add (UX Open Item #3)
+86. PATCH /menu-sets `dishIds` មិនបញ្ជាក់ថាបដិសេធ Dish Archived ឬអត់
+
+**Epic 11 (Event)**
+87. Schema `Event` គ្មាន `status` → Badge កំពុងមក/កន្លងទៅ គណនា Client
+88. GET /events មានតែ `?upcoming=true` (≥ now) → Tab Filter Client (≥ ថ្ងៃនេះ 00:00); គ្មាន Pagination
+89. `eventDate` ISO datetime vs UX ថ្ងៃតែមួយ → ផ្ញើ 12:00 ម៉ោងក្នុងស្រុក
+90. GET /events (raw) គ្មានចំនួន Dish/Menu Set/ថ្លៃ
+91. Event គ្មាន Archive/Delete (Contract §15.6)
+92. Contract មិនបដិសេធ `eventDate` អតីតកាល/`tableCount` ធំហួសហេតុ
+93. US-52 Tech Note ចង់ Expand Menu Set ជា Dish តែ Schema/Contract ទុក `EventMenuSet` Reference
+94. GET /events/:id nested `dish`/`menuSet` field មិនបញ្ជាក់; Menu Set គ្មាន Dish ខាងក្នុង → ការពារស្ទួនតាម Menu Set មិនពេញ; `skipDuplicates` ស្ងៀម
+95. Clone: Frontend បង្ខំផ្ញើ `name` + `eventDate`; Suffix KM "(ចម្លង)"/EN "(Copy)"
+96. POST /events/:id/items ឆ្លើយ Event + dishes + menuSets (shape ដូច #94)
+97. Dish/Menu Set Archived ក្រោយបន្ថែមចូល Event — Badge បើ `isArchived` មាន
+
+**Cost / Dashboard / Vendor**
+98. US-53 S1: Dish ស្ទួន (Direct + តាម Menu Set) រាប់ម្តងឬពីរដង — Mock រាប់ម្តង
+99. Schema `DishIngredient` គ្មាន `unitId` — `quantityUsed` សន្មតជាខ្នាតរបស់ ChefIngredient; គ្មានបំប្លែង Unit
+100. `ShoppingItem` គ្មាន Category → ទាញ my-stock បន្ថែម; ស្នើបន្ថែម `categoryId`/`category`
+101. 9E មិនទាន់ធ្វើ → ការគណនាគុណ `tableCount` គ្រប់ម្ហូប
+102. `cost-calculation` និង `shopping-list` ស្ទួនគ្នា
+103. GET /dashboard គ្មាន "Event ខែនេះ" → រាប់ក្នុង Client ពី GET /events
+104. `monthlySpending` និយមន័យមិនច្បាស់
+105. `upcomingEvents` លំដាប់មិនបញ្ជាក់ + `≥ now` ≠ Tab "កំពុងមក"
+106. `dishCount`/`menuSetCount` មិនបញ្ជាក់ថារាប់ Archived ឬអត់
+107. `dashboard.subscription` ស្ទួន GET /subscription/me → មិនប្រើ
+108. US-54 Tech Note Cache — ពឹង Backend
+109. Filter Vendor ក្នុង Client → Endpoint `…/shopping-list/vendor/:id` មិនប្រើ
+110. PATCH /vendor-presets/:id គ្មាន Zod + ឆ្លើយ `null` → Frontend ពិនិត្យ + ទាញថ្មី
+111. POST /vendor-presets ឆ្លើយ raw (គ្មាន `ingredients`) → ទាញបញ្ជីថ្មី
+112. Template ឱ្យ `ingredients:[{id,name}]` គ្មាន `isActive` → ដកគ្រឿងផ្សំ Archived ពេល Save (Warning)
+113. US-55 S1 "ជ្រើសពី Shopping List" vs UX "Category/Ingredient" → ជ្រើសពី Stock ទាំងមូល
+114. Template ឈ្មោះ: Max length/Case-sensitivity មិនបញ្ជាក់ (UI 60 តួ)
+115. "មិនក្នុង Template ណាមួយ" គណនា Client (ទាញ Template ទាំងអស់; គ្មាន Pagination)
+
+**Report (PDF/Excel)**
+116. US-58 S3 Telegram: គ្មាន Endpoint
+117. PDF A4 បង្កើតដោយ Backend — Preview Frontend ប៉ាន់ស្មាន; ពុម្ពអក្សរខ្មែរ/Layout មិនបញ្ជាក់
+118. US-58 S1/S2 បំបែក Generate/Download តែ Contract ឱ្យ PDF ក្នុង Request តែមួយ
+119. Body PDF ដែលមាន `items` — Backend ត្រូវមិនបន្ថែមតម្លៃ (Business Secret)
+120. Contract មិនបញ្ជាក់ Limit `items`/Validation `totalQuantity > 0`/ប្រវែង `title`
+121. Quick Edit ថែមគ្រឿងផ្សំពី Stock (មិនតម្រូវនៅក្នុង Event) — ត្រូវបញ្ជាក់ជាមួយ Client
+122. ចំណងជើង PDF លំនាំដើម (`<Event> · <Template>`) បង្កើតក្នុង Frontend
+123. Excel Column (ឈ្មោះម្ហូប, គ្រឿងផ្សំ, បរិមាណ, តម្លៃរាយ, តម្លៃសរុប) — Frontend ផ្ទៀងផ្ទាត់មិនបាន; ត្រូវសាកល្បងអក្សរខ្មែរ UTF-8 ក្នុង Excel
+124. US-59 S2 Export ប្រចាំខែ + UX 11.9 ជ្រើស Scope: គ្មាន Endpoint
+125. US-59 CSV (UTF-8 BOM): គ្មាន Endpoint
+126. US-59 S3: Empty ពិនិត្យ Client; Response Backend ពេលគ្មានទិន្នន័យមិនបញ្ជាក់
+127. Excel រួម Event ទាំងមូល (គ្មាន Parameter Template)
+128. Excel/PDF មិនតម្រូវ Subscription សកម្ម (Contract §12) — Business ត្រូវសម្រេច
+
+**Epic 12 (Checklist)**
+129. US-60 S3: Contract ឱ្យ `progress`/`purchasedCount`/`totalCount` តែ Tech Note ចង់ឱ្យគណនា Frontend → Frontend មិនប្រើ field ទាំងនោះ
+130. Toggle Endpoint ជា Auth+Sub (403 ពេលផុតកំណត់) → Rollback + Upgrade Modal
+131. Check-off ជាប់ (eventId, chefIngredientId): Dish ដក/ប្តូរតុ → នៅជាប់; Clone មិនចម្លង (សន្មត)
+132. Response Toggle (`EventPurchaseStatus`) shape មិនបញ្ជាក់ → មិនប្រើ
+133. Sync ឆ្លងឧបករណ៍: គ្មាន Push/Polling → ទាញថ្មីពេល Tab មើលឃើញវិញ; Last-write-wins
+134. Group តាម Category: ShoppingItem គ្មាន Category (#100) + គ្មាន Sub-Category (#1)
+135. Checklist មិនប្រើ Vendor Template Filter
+
+**កំណត់សម្គាល់ Frontend (មិនមែន Backend)**
+136. Dashboard "ផ្លូវកាត់" ស្ទួន Bottom Nav (រក្សា: Menu Sets មិនមែន Tab)
+137. ទំព័រ Root នៅមានប៊ូតុង ← (`backTo="/"`) ស្ទួន Nav — អាចលុបក្រោយ
+138. `CalendarGlyph` ស្ទួន `CalendarIcon` ក្នុង Icons.jsx — អាចជំនួសក្រោយ
+139. Tab "ផ្សេងៗ" → /profile (មិនមាន Menu Hub)
+140. `useTextFieldFocus` ប្រើ `pointer: coarse` — iPad + Keyboard ខាងក្រៅ អាចលាក់ Nav
+141. `HomePlaceholder` + `QuickLink` ក្នុង App.jsx ទុកជា Backup (មិនប្រើ)
+142. Mock `.xlsx` មិនមែន Workbook ពិត (គ្មាន Library សរសេរ Excel) — សាកល្បងជាមួយ Backend ពិត
 
 ## សំណួរ/ការសម្រេចចិត្តដែលនៅបើក
 - Epic 4-6: UI បង្ហាញ Visa/Wing (សារ "មិនទាន់គាំទ្រ") ឬតែ ABA PayWay?

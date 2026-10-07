@@ -62,5 +62,13 @@
   "DISH_NOT_FOUND": "រកមិនឃើញមុខម្ហូបនេះ",
   "DISH_IN_USE": "មិនអាចលុបបានទេ ព្រោះកំពុងប្រើក្នុង {{count}} កញ្ចប់ម៉ឺនុយ",
   "DISH_INGREDIENTS_NOT_IN_STOCK": "គ្រឿងផ្សំមួយចំនួនមិនមានក្នុងស្តុក",
-  "VALIDATION_INVALID_URL": "តំណមិនត្រឹមត្រូវ"
+  "VALIDATION_INVALID_URL": "តំណមិនត្រឹមត្រូវ",
+  "VALIDATION_INVALID_DATETIME": "កាលបរិច្ឆេទមិនត្រឹមត្រូវ",
+  "MENU_SET_NOT_FOUND": "រកមិនឃើញកញ្ចប់ម៉ឺនុយនេះ",
+  "MENU_SET_DISHES_INVALID": "មុខម្ហូបមួយចំនួនមិនត្រឹមត្រូវ ឬត្រូវបានលុបចោល",
+  "EVENT_NOT_FOUND": "រកមិនឃើញកម្មវិធីនេះ",
+  "EVENT_DISHES_INVALID": "មុខម្ហូបមួយចំនួនមិនត្រឹមត្រូវ ឬត្រូវបានលាក់",
+  "EVENT_MENU_SETS_INVALID": "កញ្ចប់ម៉ឺនុយមួយចំនួនមិនត្រឹមត្រូវ ឬត្រូវបានលាក់",
+  "VENDOR_PRESET_EXISTS": "មាន Template ឈ្មោះនេះរួចហើយ",
+  "VENDOR_PRESET_NOT_FOUND": "រកមិនឃើញ Template នេះ"
 }

@@ -1,0 +1,212 @@
+{
+  "back": "ត្រឡប់ក្រោយ",
+  "retry": "ព្យាយាមម្តងទៀត",
+  "list": {
+    "title": "កម្មវិធី",
+    "add": "បង្កើតកម្មវិធី",
+    "empty": "មិនទាន់មានកម្មវិធី",
+    "emptyCta": "បង្កើតកម្មវិធីដំបូង",
+    "noMatch": "មិនមានកម្មវិធីក្នុងប្រភេទនេះ",
+    "tabs": {
+      "upcoming": "កំពុងមក",
+      "past": "កន្លងទៅ",
+      "all": "ទាំងអស់"
+    },
+    "tables": "{{count}} តុ",
+    "status": {
+      "upcoming": "កំពុងមក",
+      "past": "កន្លងទៅ"
+    }
+  },
+  "form": {
+    "titleNew": "បង្កើតកម្មវិធី",
+    "titleEdit": "កែប្រែកម្មវិធី",
+    "name": "ឈ្មោះកម្មវិធី",
+    "namePlaceholder": "ឧ. មង្គលការ សុខា & ដារា",
+    "date": "កាលបរិច្ឆេទ",
+    "tableCount": "ចំនួនតុ",
+    "save": "រក្សាទុក",
+    "notFound": "រកមិនឃើញកម្មវិធីនេះ",
+    "backToList": "ត្រឡប់ទៅបញ្ជីកម្មវិធី",
+    "discardTitle": "បោះបង់ការផ្លាស់ប្តូរ?",
+    "discardMessage": "ការផ្លាស់ប្តូរដែលមិនទាន់រក្សាទុកនឹងបាត់បង់",
+    "discardConfirm": "បោះបង់",
+    "keepEditing": "បន្តកែ",
+    "validation": {
+      "nameRequired": "សូមបញ្ចូលឈ្មោះកម្មវិធី",
+      "dateRequired": "សូមជ្រើសរើសកាលបរិច្ឆេទ",
+      "dateInvalid": "កាលបរិច្ឆេទមិនត្រឹមត្រូវ",
+      "tableRequired": "សូមបញ្ចូលចំនួនតុ",
+      "tablePositive": "ចំនួនតុត្រូវជាចំនួនគត់ធំជាង 0"
+    }
+  },
+  "toast": {
+    "created": "បានបង្កើតកម្មវិធីថ្មី",
+    "updated": "បានរក្សាទុកការផ្លាស់ប្តូរ",
+    "cloned": "បានចម្លងកម្មវិធី",
+    "itemsAdded": "បានបន្ថែមចូលកម្មវិធី",
+    "removed": "បានដកចេញពីកម្មវិធី"
+  },
+  "detail": {
+    "tabs": {
+      "dishes": "មុខម្ហូប",
+      "cost": "ការគណនាចំណាយ",
+      "shopping": "បញ្ជីទិញ"
+    },
+    "add": "បន្ថែមមុខម្ហូប",
+    "adding": "កំពុងបន្ថែម...",
+    "emptyItems": "មិនទាន់មានមុខម្ហូបក្នុងកម្មវិធីនេះ",
+    "menuSetsTitle": "កញ្ចប់ម៉ឺនុយ",
+    "dishesTitle": "មុខម្ហូបរាយ",
+    "archivedBadge": "បានលាក់",
+    "removeAria": "ដក {{name}} ចេញ",
+    "removeTitle": "ដក \"{{name}}\" ចេញពីកម្មវិធី?",
+    "removeMessage": "ការដកចេញនេះមិនប៉ះពាល់ដល់មុខម្ហូប ឬកញ្ចប់ម៉ឺនុយដើមទេ។",
+    "removeConfirm": "ដកចេញ",
+    "cancel": "បោះបង់",
+    "soon": "មុខងារនេះនឹងមានក្នុងជំហានបន្ទាប់",
+    "menu": {
+      "title": "ជម្រើស",
+      "cancel": "បិទ",
+      "edit": "កែប្រែ",
+      "clone": "ចម្លងកម្មវិធី (Clone)",
+      "excel": "នាំចេញ Excel"
+    }
+  },
+  "picker": {
+    "title": "បន្ថែមទៅកម្មវិធី",
+    "tabs": {
+      "dishes": "មុខម្ហូប",
+      "menuSets": "កញ្ចប់ម៉ឺនុយ"
+    },
+    "searchPlaceholder": "ស្វែងរក...",
+    "selected": "បានជ្រើសរើស ({{count}})",
+    "add": "បន្ថែម →",
+    "alreadyAdded": "មានក្នុងកម្មវិធីរួចហើយ",
+    "emptyDishes": "មិនទាន់មានមុខម្ហូបសកម្ម",
+    "emptyDishesCta": "បង្កើតមុខម្ហូបមុន",
+    "emptyMenuSets": "មិនទាន់មានកញ្ចប់ម៉ឺនុយសកម្ម",
+    "emptyMenuSetsCta": "បង្កើតកញ្ចប់ម៉ឺនុយមុន",
+    "noMatch": "រកមិនឃើញ"
+  },
+  "clone": {
+    "title": "ចម្លងកម្មវិធី",
+    "hint": "មុខម្ហូប និងកញ្ចប់ម៉ឺនុយទាំងអស់នឹងត្រូវចម្លងតាម។ សូមកំណត់កាលបរិច្ឆេទថ្មី។",
+    "name": "ឈ្មោះកម្មវិធីថ្មី",
+    "date": "កាលបរិច្ឆេទថ្មី",
+    "suffix": "(ចម្លង)",
+    "submit": "ចម្លង",
+    "cancel": "បោះបង់"
+  },
+  "cost": {
+    "grandTotal": "ថវិកាសរុបដែលត្រូវការ",
+    "summary": "{{count}} គ្រឿងផ្សំ · {{tables}} តុ",
+    "view": {
+      "grouped": "តាមក្រុម",
+      "flat": "បញ្ជីរាប"
+    },
+    "perTable": "ក្នុង 1 តុ: {{qty}} {{unit}}",
+    "other": "ផ្សេងៗ (គ្មានប្រភេទ)",
+    "groupCount": "{{count}} មុខ",
+    "empty": "មិនទាន់មានមុខម្ហូបក្នុងកម្មវិធីនេះ ដូច្នេះមិនទាន់មានអ្វីត្រូវគណនា",
+    "emptyCta": "ទៅបន្ថែមមុខម្ហូប",
+    "note": "បរិមាណសរុប = ចំនួនក្នុង 1 តុ × ចំនួនតុ · ថ្លៃគណនាដោយប្រព័ន្ធតាមតម្លៃស្តុកបច្ចុប្បន្ន"
+  },
+  "shopping": {
+    "filterLabel": "Template:",
+    "all": "ទាំងអស់",
+    "uncategorized": "មិនក្នុង Template ណាមួយ",
+    "summary": "{{count}} មុខ · {{total}}",
+    "empty": "មិនទាន់មានមុខម្ហូបក្នុងកម្មវិធីនេះ ដូច្នេះមិនទាន់មានបញ្ជីទិញ",
+    "emptyCta": "ទៅបន្ថែមមុខម្ហូប",
+    "noMatch": "គ្មានគ្រឿងផ្សំក្នុងជម្រើសនេះសម្រាប់កម្មវិធីនេះ",
+    "generatePdf": "បង្កើត PDF",
+    "exportExcel": "នាំចេញ Excel",
+    "checklistTitle": "បញ្ជីទិញជាក់ស្តែង",
+    "checklistProgress": "បានទិញ {{done}}/{{total}} មុខ"
+  },
+  "vendor": {
+    "title": "ជ្រើសរើស Template",
+    "create": "បង្កើត Template ថ្មី",
+    "editAria": "កែ {{name}}",
+    "deleteAria": "លុប {{name}}",
+    "formTitleNew": "បង្កើត Template ថ្មី",
+    "formTitleEdit": "កែ Template",
+    "name": "ឈ្មោះ Template",
+    "namePlaceholder": "ឧ. ម៉ូយសាច់",
+    "searchPlaceholder": "ស្វែងរកគ្រឿងផ្សំ...",
+    "selected": "បានជ្រើសរើស ({{count}})",
+    "save": "រក្សាទុក Template",
+    "noCategory": "គ្មានប្រភេទ",
+    "stockEmpty": "ស្តុកគ្រឿងផ្សំទទេ",
+    "stockEmptyCta": "ទៅបន្ថែមគ្រឿងផ្សំមុន",
+    "droppedWarning": "Template នេះមាន {{count}} គ្រឿងផ្សំដែលមិនមានក្នុងស្តុកសកម្ម (ប្រហែលត្រូវបានលាក់) ហើយនឹងត្រូវដកចេញពេលរក្សាទុក",
+    "deleteTitle": "លុប Template \"{{name}}\"?",
+    "deleteMessage": "ការលុបនេះមិនប៉ះពាល់ដល់គ្រឿងផ្សំ ឬកម្មវិធីទេ។",
+    "deleteConfirm": "លុប",
+    "cancel": "បោះបង់",
+    "validation": {
+      "nameRequired": "សូមបញ្ចូលឈ្មោះ Template",
+      "ingredientsRequired": "សូមជ្រើសគ្រឿងផ្សំយ៉ាងតិចមួយ"
+    },
+    "toast": {
+      "created": "បានបង្កើត Template",
+      "updated": "បានរក្សាទុក Template",
+      "deleted": "បានលុប Template"
+    }
+  },
+  "report": {
+    "title": "របាយការណ៍បញ្ជាទិញ",
+    "previewAria": "មើលរបាយការណ៍ជាមុន",
+    "previewNote": "ទម្រង់ប្រហាក់ប្រហែល PDF ទំហំ A4 · បង្ហាញតែឈ្មោះគ្រឿងផ្សំ និងបរិមាណ (មិនមានតម្លៃ)",
+    "titleLabel": "ចំណងជើងរបាយការណ៍",
+    "edit": "កែប្រែបញ្ជី",
+    "doneEdit": "រួចរាល់ (មើលជាមុន)",
+    "reset": "កំណត់ឡើងវិញ",
+    "add": "បន្ថែមធាតុ",
+    "quantity": "បរិមាណ",
+    "removeAria": "ដក {{name}} ចេញ",
+    "col": {
+      "name": "គ្រឿងផ្សំ",
+      "quantity": "បរិមាណ"
+    },
+    "count": "សរុប {{count}} មុខ",
+    "empty": "គ្មានគ្រឿងផ្សំក្នុងរបាយការណ៍ សូមបន្ថែមធាតុ ឬកំណត់ឡើងវិញ",
+    "generate": "បង្កើត PDF",
+    "localNote": "ការកែប្រែនៅទីនេះមានប្រសិទ្ធភាពសម្រាប់ PDF នេះតែប៉ុណ្ណោះ មិនប៉ះពាល់ Template ទេ",
+    "validation": {
+      "qtyRequired": "សូមបញ្ចូលបរិមាណ",
+      "qtyPositive": "បរិមាណត្រូវធំជាង 0"
+    },
+    "toast": {
+      "downloaded": "បានទាញយក PDF"
+    }
+  },
+  "excel": {
+    "title": "នាំចេញ Excel",
+    "message": "ឯកសារនេះមានលម្អិតតម្លៃពេញលេញ (មិនលាក់ដូច PDF) ហើយរួមទាំងកម្មវិធីនេះទាំងមូល មិនកាត់តាម Template ទេ។ សូមកុំចែករំលែកជាមួយអ្នកលក់។",
+    "confirm": "ទាញយក Excel",
+    "cancel": "បោះបង់",
+    "toast": {
+      "exported": "បានទាញយកឯកសារ Excel",
+      "noData": "គ្មានទិន្នន័យសម្រាប់ Export"
+    }
+  },
+  "checklist": {
+    "title": "បញ្ជីទិញទំនិញ",
+    "progressAria": "វឌ្ឍនភាពនៃការទិញ",
+    "progress": "បានទិញ {{done}}/{{total}} មុខ",
+    "completeBanner": "ទិញគ្រប់គ្រាន់ហើយ! 🎉",
+    "filter": {
+      "all": "ទាំងអស់ ({{count}})",
+      "pending": "មិនទាន់ទិញ ({{count}})"
+    },
+    "nothingLeft": "មិនមានអ្វីសល់ត្រូវទិញទេ",
+    "empty": "មិនទាន់មានគ្រឿងផ្សំត្រូវទិញ សូមបន្ថែមមុខម្ហូបក្នុងកម្មវិធីនេះ",
+    "emptyCta": "ទៅបន្ថែមមុខម្ហូប",
+    "dismiss": "បិទសារ",
+    "toast": {
+      "completed": "ទិញគ្រប់គ្រាន់ហើយ! 🎉"
+    }
+  }
+}

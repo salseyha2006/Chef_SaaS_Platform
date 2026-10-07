@@ -1,7 +1,10 @@
 {
   "back": "Back",
   "retry": "Try again",
-  "menu": { "browse": "Add ingredients from presets", "stock": "Ingredient stock" },
+  "menu": {
+    "browse": "Add ingredients from presets",
+    "stock": "Ingredient stock"
+  },
   "inStock": "In stock",
   "inStockHint": "Already in your stock",
   "selectedCount": "Selected ({{count}})",
@@ -36,7 +39,12 @@
     "all": "All",
     "allIn": "All in {{name}}",
     "expand": "Show sub-categories",
-    "sort": { "label": "Sort", "name": "By name", "priceAsc": "Price low → high", "priceDesc": "Price high → low" },
+    "sort": {
+      "label": "Sort",
+      "name": "By name",
+      "priceAsc": "Price low → high",
+      "priceDesc": "Price high → low"
+    },
     "empty": "No ingredients in stock yet",
     "emptyCta": "Add now",
     "noMatch": "No ingredients found",
@@ -72,6 +80,7 @@
     "imported": "Imported {{count}} ingredients",
     "saved": "Changes saved",
     "archived": "Hidden from stock",
-    "deleted": "Deleted permanently"
+    "deleted": "Deleted permanently",
+    "savedRecalc": "Saved · dish costs were updated automatically"
   }
 }

@@ -6,11 +6,14 @@
     "add": "បង្កើតមុខម្ហូប",
     "empty": "មិនទាន់មានមុខម្ហូប",
     "emptyCta": "បង្កើតមុខម្ហូបដំបូង",
+    "emptyArchived": "មិនមានមុខម្ហូបដែលបានលាក់",
     "noMatch": "រកមិនឃើញមុខម្ហូប",
     "totalCost": "ថ្លៃដើមសរុប",
     "noCost": "—",
-    "emptyArchived": "មិនមានមុខម្ហូបដែលបានលាក់",
-    "tabs": { "active": "សកម្ម", "archived": "បានលាក់" }
+    "tabs": {
+      "active": "សកម្ម",
+      "archived": "បានលាក់"
+    }
   },
   "view": {
     "label": "ទម្រង់បង្ហាញ",
@@ -23,32 +26,6 @@
     "duplicated": "បានចម្លងមុខម្ហូប",
     "archived": "បានលាក់មុខម្ហូប",
     "deleted": "បានលុបមុខម្ហូបទាំងស្រុង"
-  },
-  "detail": {
-    "total": "ថ្លៃដើមសរុប",
-    "breakdown": "ការបំបែកថ្លៃដើម",
-    "noBreakdown": "មិនមានទិន្នន័យគ្រឿងផ្សំ",
-    "highest": "ខ្ពស់បំផុត",
-    "archivedBadge": "បានលាក់",
-    "duplicating": "កំពុងចម្លង...",
-    "col": { "ingredient": "គ្រឿងផ្សំ", "quantity": "បរិមាណ", "unitPrice": "តម្លៃឯកតា", "subtotal": "សរុប" },
-    "menu": {
-      "title": "ជម្រើស",
-      "cancel": "បិទ",
-      "edit": "កែប្រែ",
-      "duplicate": "ចម្លង (Duplicate)",
-      "archive": "លាក់ចេញពីបញ្ជី (Archive)",
-      "delete": "លុបចោលទាំងស្រុង (Delete)"
-    },
-    "cancel": "បោះបង់",
-    "archiveTitle": "លាក់ \"{{name}}\" ចេញពីបញ្ជី?",
-    "archiveMessage": "មុខម្ហូបនេះនឹងលែងបង្ហាញក្នុងបញ្ជីសកម្ម តែទិន្នន័យ និងកម្មវិធីចាស់ៗនៅតែដដែល។",
-    "archiveConfirm": "លាក់",
-    "deleteTitle": "លុប \"{{name}}\" ទាំងស្រុង?",
-    "deleteMessage": "សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។",
-    "deleteConfirm": "លុបចោល",
-    "inUseWarning": "មិនអាចលុបបានទេ ព្រោះកំពុងប្រើក្នុង {{count}} កញ្ចប់ម៉ឺនុយ។ អ្នកអាចលាក់វាជំនួសវិញ។",
-    "archiveInstead": "លាក់ជំនួស"
   },
   "form": {
     "titleNew": "បង្កើតមុខម្ហូប",
@@ -90,5 +67,36 @@
     "empty": "ស្តុកគ្រឿងផ្សំទទេ",
     "emptyCta": "ទៅបន្ថែមគ្រឿងផ្សំមុន",
     "noMatch": "រកមិនឃើញគ្រឿងផ្សំ"
+  },
+  "detail": {
+    "total": "ថ្លៃដើមសរុប",
+    "breakdown": "ការបំបែកថ្លៃដើម",
+    "noBreakdown": "មិនមានទិន្នន័យគ្រឿងផ្សំ",
+    "highest": "ខ្ពស់បំផុត",
+    "archivedBadge": "បានលាក់",
+    "duplicating": "កំពុងចម្លង...",
+    "col": {
+      "ingredient": "គ្រឿងផ្សំ",
+      "quantity": "បរិមាណ",
+      "unitPrice": "តម្លៃឯកតា",
+      "subtotal": "សរុប"
+    },
+    "menu": {
+      "title": "ជម្រើស",
+      "cancel": "បិទ",
+      "edit": "កែប្រែ",
+      "duplicate": "ចម្លង (Duplicate)",
+      "archive": "លាក់ចេញពីបញ្ជី (Archive)",
+      "delete": "លុបចោលទាំងស្រុង (Delete)"
+    },
+    "cancel": "បោះបង់",
+    "archiveTitle": "លាក់ \"{{name}}\" ចេញពីបញ្ជី?",
+    "archiveMessage": "មុខម្ហូបនេះនឹងលែងបង្ហាញក្នុងបញ្ជីសកម្ម តែទិន្នន័យ និងកម្មវិធីចាស់ៗនៅតែដដែល។",
+    "archiveConfirm": "លាក់",
+    "deleteTitle": "លុប \"{{name}}\" ទាំងស្រុង?",
+    "deleteMessage": "សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។",
+    "deleteConfirm": "លុបចោល",
+    "inUseWarning": "មិនអាចលុបបានទេ ព្រោះកំពុងប្រើក្នុង {{count}} កញ្ចប់ម៉ឺនុយ។ អ្នកអាចលាក់វាជំនួសវិញ។",
+    "archiveInstead": "លាក់ជំនួស"
   }
 }

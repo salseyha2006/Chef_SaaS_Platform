@@ -1,0 +1,212 @@
+{
+  "back": "Back",
+  "retry": "Try again",
+  "list": {
+    "title": "Events",
+    "add": "Create event",
+    "empty": "No events yet",
+    "emptyCta": "Create your first event",
+    "noMatch": "No events in this category",
+    "tabs": {
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "all": "All"
+    },
+    "tables": "{{count}} tables",
+    "status": {
+      "upcoming": "Upcoming",
+      "past": "Past"
+    }
+  },
+  "form": {
+    "titleNew": "Create event",
+    "titleEdit": "Edit event",
+    "name": "Event name",
+    "namePlaceholder": "e.g. Sokha & Dara wedding",
+    "date": "Date",
+    "tableCount": "Number of tables",
+    "save": "Save",
+    "notFound": "Event not found",
+    "backToList": "Back to events",
+    "discardTitle": "Discard changes?",
+    "discardMessage": "Unsaved changes will be lost",
+    "discardConfirm": "Discard",
+    "keepEditing": "Keep editing",
+    "validation": {
+      "nameRequired": "Please enter an event name",
+      "dateRequired": "Please choose a date",
+      "dateInvalid": "Invalid date",
+      "tableRequired": "Please enter the number of tables",
+      "tablePositive": "Number of tables must be a whole number greater than 0"
+    }
+  },
+  "toast": {
+    "created": "Event created",
+    "updated": "Changes saved",
+    "cloned": "Event cloned",
+    "itemsAdded": "Added to event",
+    "removed": "Removed from event"
+  },
+  "detail": {
+    "tabs": {
+      "dishes": "Dishes",
+      "cost": "Cost",
+      "shopping": "Shopping list"
+    },
+    "add": "Add dishes",
+    "adding": "Adding...",
+    "emptyItems": "No dishes in this event yet",
+    "menuSetsTitle": "Menu sets",
+    "dishesTitle": "Individual dishes",
+    "archivedBadge": "Archived",
+    "removeAria": "Remove {{name}}",
+    "removeTitle": "Remove \"{{name}}\" from this event?",
+    "removeMessage": "This does not affect the original dish or menu set.",
+    "removeConfirm": "Remove",
+    "cancel": "Cancel",
+    "soon": "This feature arrives in the next step",
+    "menu": {
+      "title": "Options",
+      "cancel": "Close",
+      "edit": "Edit",
+      "clone": "Clone event",
+      "excel": "Export to Excel"
+    }
+  },
+  "picker": {
+    "title": "Add to event",
+    "tabs": {
+      "dishes": "Dishes",
+      "menuSets": "Menu sets"
+    },
+    "searchPlaceholder": "Search...",
+    "selected": "Selected ({{count}})",
+    "add": "Add →",
+    "alreadyAdded": "Already in this event",
+    "emptyDishes": "You have no active dishes yet",
+    "emptyDishesCta": "Create a dish first",
+    "emptyMenuSets": "You have no active menu sets yet",
+    "emptyMenuSetsCta": "Create a menu set first",
+    "noMatch": "No results"
+  },
+  "clone": {
+    "title": "Clone event",
+    "hint": "All dishes and menu sets will be copied. Please set the new date.",
+    "name": "New event name",
+    "date": "New date",
+    "suffix": "(Copy)",
+    "submit": "Clone",
+    "cancel": "Cancel"
+  },
+  "cost": {
+    "grandTotal": "Total budget needed",
+    "summary": "{{count}} ingredients · {{tables}} tables",
+    "view": {
+      "grouped": "Grouped",
+      "flat": "Flat list"
+    },
+    "perTable": "Per table: {{qty}} {{unit}}",
+    "other": "Other (uncategorized)",
+    "groupCount": "{{count}} items",
+    "empty": "This event has no dishes yet, so there is nothing to calculate",
+    "emptyCta": "Add dishes",
+    "note": "Total quantity = per-table amount × number of tables · cost uses current stock prices"
+  },
+  "shopping": {
+    "filterLabel": "Template:",
+    "all": "All",
+    "uncategorized": "Not in any template",
+    "summary": "{{count}} items · {{total}}",
+    "empty": "This event has no dishes yet, so there is no shopping list",
+    "emptyCta": "Add dishes",
+    "noMatch": "No ingredients in this selection for this event",
+    "generatePdf": "Generate PDF",
+    "exportExcel": "Export to Excel",
+    "checklistTitle": "Live checklist",
+    "checklistProgress": "{{done}}/{{total}} items purchased"
+  },
+  "vendor": {
+    "title": "Choose a template",
+    "create": "Create new template",
+    "editAria": "Edit {{name}}",
+    "deleteAria": "Delete {{name}}",
+    "formTitleNew": "New template",
+    "formTitleEdit": "Edit template",
+    "name": "Template name",
+    "namePlaceholder": "e.g. Meat vendor",
+    "searchPlaceholder": "Search ingredients...",
+    "selected": "Selected ({{count}})",
+    "save": "Save template",
+    "noCategory": "No category",
+    "stockEmpty": "Your ingredient stock is empty",
+    "stockEmptyCta": "Add ingredients first",
+    "droppedWarning": "{{count}} ingredient(s) in this template are not in your active stock (possibly archived) and will be removed on save",
+    "deleteTitle": "Delete template \"{{name}}\"?",
+    "deleteMessage": "This does not affect your ingredients or events.",
+    "deleteConfirm": "Delete",
+    "cancel": "Cancel",
+    "validation": {
+      "nameRequired": "Please enter a template name",
+      "ingredientsRequired": "Select at least one ingredient"
+    },
+    "toast": {
+      "created": "Template created",
+      "updated": "Template saved",
+      "deleted": "Template deleted"
+    }
+  },
+  "report": {
+    "title": "Purchasing report",
+    "previewAria": "Report preview",
+    "previewNote": "Approximate A4 PDF layout · shows ingredient names and quantities only (no prices)",
+    "titleLabel": "Report title",
+    "edit": "Edit list",
+    "doneEdit": "Done (preview)",
+    "reset": "Reset",
+    "add": "Add item",
+    "quantity": "Quantity",
+    "removeAria": "Remove {{name}}",
+    "col": {
+      "name": "Ingredient",
+      "quantity": "Quantity"
+    },
+    "count": "Total {{count}} items",
+    "empty": "No ingredients in this report. Add an item or reset.",
+    "generate": "Generate PDF",
+    "localNote": "Changes here apply to this PDF only and never change your template",
+    "validation": {
+      "qtyRequired": "Enter a quantity",
+      "qtyPositive": "Quantity must be greater than 0"
+    },
+    "toast": {
+      "downloaded": "PDF downloaded"
+    }
+  },
+  "excel": {
+    "title": "Export to Excel",
+    "message": "This file includes full price details (unlike the PDF) and covers the whole event, not just a template. Do not share it with vendors.",
+    "confirm": "Download Excel",
+    "cancel": "Cancel",
+    "toast": {
+      "exported": "Excel file downloaded",
+      "noData": "No data to export"
+    }
+  },
+  "checklist": {
+    "title": "Shopping checklist",
+    "progressAria": "Purchase progress",
+    "progress": "{{done}}/{{total}} items purchased",
+    "completeBanner": "Everything is bought! 🎉",
+    "filter": {
+      "all": "All ({{count}})",
+      "pending": "To buy ({{count}})"
+    },
+    "nothingLeft": "Nothing left to buy",
+    "empty": "No ingredients to buy yet. Add dishes to this event first.",
+    "emptyCta": "Add dishes",
+    "dismiss": "Dismiss",
+    "toast": {
+      "completed": "Everything is bought! 🎉"
+    }
+  }
+}

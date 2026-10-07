@@ -2,6 +2,7 @@ import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SubscriptionProvider } from './context/SubscriptionContext';
 import { OnboardingGate, ProtectedRoute, PublicOnlyRoute, SubscriptionGate } from './routes/guards';
+import MainTabsLayout from './components/layout/MainTabsLayout';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
@@ -26,12 +27,21 @@ import CatalogConfigPage from './pages/CatalogConfigPage';
 import IngredientImportPage from './pages/IngredientImportPage';
 import IngredientStockPage from './pages/IngredientStockPage';
 import IngredientDetailPage from './pages/IngredientDetailPage';
+import DashboardPage from './pages/DashboardPage';
 import DishListPage from './pages/DishListPage';
-import DishFormPage from './pages/DishFormPage'; // (1) Import DishFormPage
-import { BasketIcon, BowlIcon } from './components/ui/Icons';
+import DishFormPage from './pages/DishFormPage';
 import DishDetailPage from './pages/DishDetailPage';
+import MenuSetListPage from './pages/MenuSetListPage';
+import MenuSetFormPage from './pages/MenuSetFormPage';
+import MenuSetDetailPage from './pages/MenuSetDetailPage';
+import EventListPage from './pages/EventListPage';
+import EventFormPage from './pages/EventFormPage';
+import EventDetailPage from './pages/EventDetailPage';
+import EventReportPage from './pages/EventReportPage';
+import EventChecklistPage from './pages/EventChecklistPage';
+import { BasketIcon } from './components/ui/Icons';
 
-// QuickLink Component បណ្តោះអាសន្ន សម្រាប់ HomePlaceholder
+// QuickLink Component បណ្តោះអាសន្ន សម្រាប់ HomePlaceholder (ទុកជា Backup — មិនលុប)
 function QuickLink({ to, icon: Icon, children }) {
   return (
     <Link to={to} className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition active:bg-slate-50">
@@ -43,7 +53,8 @@ function QuickLink({ to, icon: Icon, children }) {
   );
 }
 
-// ===== Home បណ្តោះអាសន្ន (ជំនួសដោយ Dashboard ក្នុង Epic 11) =====
+// ===== Home បណ្តោះអាសន្ន (ជំនួសដោយ DashboardPage ក្នុង 11D — ទុកជា Backup មិនលុប; ឥឡូវមិនប្រើ) =====
+// eslint-disable-next-line no-unused-vars
 function HomePlaceholder() {
   const { chef } = useAuth();
   return (
@@ -55,13 +66,12 @@ function HomePlaceholder() {
           <p className="truncate text-sm text-slate-500">{chef?.email}</p>
         </div>
       </Link>
-      
+
       <SubscriptionBadge className="mt-4" />
-      
+
       <div className="mt-6 grid grid-cols-2 gap-4">
         <QuickLink to="/settings/catalog" icon={BasketIcon}>Catalog</QuickLink>
         <QuickLink to="/ingredients" icon={BasketIcon}>ស្តុកគ្រឿងផ្សំ</QuickLink>
-        <QuickLink to="/dishes" icon={BowlIcon}>មុខម្ហូប</QuickLink>
       </div>
 
       <p className="mt-6 text-center text-sm text-slate-400">Dashboard — Epic 11</p>
@@ -88,7 +98,10 @@ export default function App() {
               <Route path="/onboarding" element={<OnboardingPage />} />
               <Route element={<OnboardingGate />}>
                 {/* មិនត្រូវ Lock ពេល Expired: ត្រូវតែចូលបាន ដើម្បីទិញ/ចាកចេញ */}
-                <Route path="/profile" element={<ProfilePage />} />
+                {/* ទំព័រ Root "ផ្សេងៗ" — មាន Bottom Nav */}
+                <Route element={<MainTabsLayout />}>
+                  <Route path="/profile" element={<ProfilePage />} />
+                </Route>
                 <Route path="/profile/edit" element={<EditProfilePage />} />
                 <Route path="/profile/password" element={<ChangePasswordPage />} />
                 <Route path="/pricing" element={<PricingPage />} />
@@ -96,7 +109,7 @@ export default function App() {
                 <Route path="/subscription-expired" element={<SubscriptionExpiredPage />} />
                 <Route path="/checkout/:planId" element={<CheckoutPage />} />
                 <Route path="/payment/success" element={<PaymentSuccessPage />} />
-                
+
                 {/* ផ្នែក Billing មិនត្រូវ Lock */}
                 <Route path="/billing" element={<BillingHistoryPage />} />
                 <Route path="/billing/transactions/:id" element={<TransactionDetailPage />} />
@@ -104,25 +117,37 @@ export default function App() {
 
                 {/* Expired → Lockout (ឬ View-only ប្រសិនបើ User ជ្រើស) */}
                 <Route element={<SubscriptionGate />}>
-                  <Route path="/" element={<HomePlaceholder />} />
+                  {/* ទំព័រ Root ៤ — មាន Bottom Nav (Home/Stock/Dishes/Events) */}
+                  <Route element={<MainTabsLayout />}>
+                    <Route path="/" element={<DashboardPage />} />
+                    <Route path="/ingredients" element={<IngredientStockPage />} />
+                    <Route path="/dishes" element={<DishListPage />} />
+                    <Route path="/events" element={<EventListPage />} />
+                  </Route>
+
                   <Route path="/settings/catalog" element={<CatalogConfigPage />} />
-                  
-                  <Route path="/ingredients" element={<IngredientStockPage />} />
+
+                  {/* Epic 8: Ingredients */}
                   <Route path="/ingredients/browse" element={<IngredientImportPage />} />
                   <Route path="/ingredients/:id" element={<IngredientDetailPage />} />
-                  
-                  {/* Route សម្រាប់មុខម្ហូប */}
-                  <Route path="/dishes" element={<DishListPage />} />
-                  
-                  {/* (2) បន្ថែម Routes ថ្មីសម្រាប់ DishFormPage */}
-                  <Route path="/dishes/new" element={<DishFormPage />} />
-                  {/* បណ្តោះអាសន្ន: 9C ជំនួស /dishes/:id ដោយ Dish Detail */}
-                  <Route path="/dishes/:id" element={<DishFormPage />} />
-                  <Route path="/dishes/:id/edit" element={<DishFormPage />} />
-                  <Route path="/dishes" element={<DishListPage />} />
+
+                  {/* Epic 9: Dishes */}
                   <Route path="/dishes/new" element={<DishFormPage />} />
                   <Route path="/dishes/:id" element={<DishDetailPage />} />
                   <Route path="/dishes/:id/edit" element={<DishFormPage />} />
+
+                  {/* Epic 10: Menu Sets */}
+                  <Route path="/menu-sets" element={<MenuSetListPage />} />
+                  <Route path="/menu-sets/new" element={<MenuSetFormPage />} />
+                  <Route path="/menu-sets/:id" element={<MenuSetDetailPage />} />
+                  <Route path="/menu-sets/:id/edit" element={<MenuSetFormPage />} />
+
+                  {/* Epic 11–12: Events */}
+                  <Route path="/events/new" element={<EventFormPage />} />
+                  <Route path="/events/:id" element={<EventDetailPage />} />
+                  <Route path="/events/:id/edit" element={<EventFormPage />} />
+                  <Route path="/events/:id/report" element={<EventReportPage />} />
+                  <Route path="/events/:id/checklist" element={<EventChecklistPage />} />
                 </Route>
               </Route>
             </Route>

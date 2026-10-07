@@ -169,7 +169,7 @@ export default function DishFormPage() {
     if (location.key !== 'default') return navigate(-1);
     return navigate(isEdit ? `/dishes/${encodeURIComponent(id)}` : '/dishes', { replace: true });
   };
-  const onBack = () => (dirty ? setDiscardOpen(true) : leave()); // US-39 S3
+  const onBack = () => (dirty ? setDiscardOpen(true) : leave());
 
   const title = isEdit ? t('form.titleEdit') : t('form.titleNew');
 

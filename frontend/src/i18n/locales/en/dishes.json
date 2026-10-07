@@ -6,11 +6,14 @@
     "add": "Create dish",
     "empty": "No dishes yet",
     "emptyCta": "Create your first dish",
+    "emptyArchived": "No archived dishes",
     "noMatch": "No dishes found",
     "totalCost": "Total cost",
     "noCost": "—",
-    "emptyArchived": "No archived dishes",
-    "tabs": { "active": "Active", "archived": "Archived" }
+    "tabs": {
+      "active": "Active",
+      "archived": "Archived"
+    }
   },
   "view": {
     "label": "View mode",
@@ -23,32 +26,6 @@
     "duplicated": "Dish duplicated",
     "archived": "Dish archived",
     "deleted": "Dish deleted"
-  },
-  "detail": {
-    "total": "Total cost",
-    "breakdown": "Cost breakdown",
-    "noBreakdown": "No ingredient data",
-    "highest": "Highest",
-    "archivedBadge": "Archived",
-    "duplicating": "Duplicating...",
-    "col": { "ingredient": "Ingredient", "quantity": "Quantity", "unitPrice": "Unit price", "subtotal": "Subtotal" },
-    "menu": {
-      "title": "Options",
-      "cancel": "Close",
-      "edit": "Edit",
-      "duplicate": "Duplicate",
-      "archive": "Archive",
-      "delete": "Delete permanently"
-    },
-    "cancel": "Cancel",
-    "archiveTitle": "Archive \"{{name}}\"?",
-    "archiveMessage": "This dish will leave the active list. Its data and past events stay intact.",
-    "archiveConfirm": "Archive",
-    "deleteTitle": "Delete \"{{name}}\" permanently?",
-    "deleteMessage": "This cannot be undone.",
-    "deleteConfirm": "Delete",
-    "inUseWarning": "Cannot delete: used in {{count}} menu set(s). You can archive it instead.",
-    "archiveInstead": "Archive instead"
   },
   "form": {
     "titleNew": "Create dish",
@@ -90,5 +67,36 @@
     "empty": "Your ingredient stock is empty",
     "emptyCta": "Add ingredients first",
     "noMatch": "No ingredients found"
+  },
+  "detail": {
+    "total": "Total cost",
+    "breakdown": "Cost breakdown",
+    "noBreakdown": "No ingredient data",
+    "highest": "Highest",
+    "archivedBadge": "Archived",
+    "duplicating": "Duplicating...",
+    "col": {
+      "ingredient": "Ingredient",
+      "quantity": "Quantity",
+      "unitPrice": "Unit price",
+      "subtotal": "Subtotal"
+    },
+    "menu": {
+      "title": "Options",
+      "cancel": "Close",
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "archive": "Archive",
+      "delete": "Delete permanently"
+    },
+    "cancel": "Cancel",
+    "archiveTitle": "Archive \"{{name}}\"?",
+    "archiveMessage": "This dish will leave the active list. Its data and past events stay intact.",
+    "archiveConfirm": "Archive",
+    "deleteTitle": "Delete \"{{name}}\" permanently?",
+    "deleteMessage": "This cannot be undone.",
+    "deleteConfirm": "Delete",
+    "inUseWarning": "Cannot delete: used in {{count}} menu set(s). You can archive it instead.",
+    "archiveInstead": "Archive instead"
   }
 }

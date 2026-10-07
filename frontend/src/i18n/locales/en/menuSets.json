@@ -1,0 +1,79 @@
+{
+  "back": "Back",
+  "retry": "Try again",
+  "list": {
+    "title": "Menu Sets",
+    "add": "Create menu set",
+    "empty": "No menu sets yet",
+    "emptyCta": "Create your first menu set",
+    "emptyArchived": "No archived menu sets",
+    "tabs": {
+      "active": "Active",
+      "archived": "Archived"
+    },
+    "dishCount": "{{count}} dishes",
+    "totalCost": "Total cost",
+    "noCost": "—"
+  },
+  "detail": {
+    "total": "Total cost",
+    "dishes": "Dishes in this set",
+    "noDishes": "This set has no dishes",
+    "archivedBadge": "Archived",
+    "edit": "Edit menu set",
+    "notFound": "Menu set not found",
+    "backToList": "Back to menu sets",
+    "menu": {
+      "title": "Options",
+      "cancel": "Close",
+      "edit": "Edit",
+      "archive": "Archive",
+      "delete": "Delete permanently"
+    },
+    "cancel": "Cancel",
+    "archiveTitle": "Archive \"{{name}}\"?",
+    "archiveMessage": "This set will leave the active list. Its data and past events stay intact.",
+    "archiveConfirm": "Archive",
+    "deleteTitle": "Delete \"{{name}}\" permanently?",
+    "deleteMessage": "This cannot be undone.",
+    "deleteConfirm": "Delete"
+  },
+  "toast": {
+    "created": "Menu set created",
+    "updated": "Changes saved",
+    "archived": "Menu set archived",
+    "deleted": "Menu set deleted"
+  },
+  "form": {
+    "titleNew": "Create menu set",
+    "titleEdit": "Edit menu set",
+    "name": "Menu set name",
+    "namePlaceholder": "e.g. Wedding set",
+    "tabs": {
+      "all": "All dishes",
+      "selected": "In set ({{count}})"
+    },
+    "searchPlaceholder": "Search dishes...",
+    "added": "✓ Added",
+    "addAria": "Add {{name}}",
+    "removeAria": "Remove {{name}}",
+    "moveUp": "Move {{name}} up",
+    "moveDown": "Move {{name}} down",
+    "allEmpty": "You have no active dishes yet",
+    "allEmptyCta": "Create a dish first",
+    "noMatch": "No dishes found",
+    "selectedEmpty": "No dishes in this set yet",
+    "selectedEmptyCta": "Choose dishes",
+    "totalCost": "Total cost",
+    "totalNote": "Estimate from dish costs — final cost is calculated on save",
+    "save": "Save",
+    "discardTitle": "Discard changes?",
+    "discardMessage": "Unsaved changes will be lost",
+    "discardConfirm": "Discard",
+    "keepEditing": "Keep editing",
+    "validation": {
+      "nameRequired": "Please enter a name",
+      "dishesRequired": "Add at least one dish"
+    }
+  }
+}

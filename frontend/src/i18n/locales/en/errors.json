@@ -57,5 +57,14 @@
   "DISH_NOT_FOUND": "Dish not found",
   "DISH_IN_USE": "Cannot delete: used in {{count}} menu set(s)",
   "DISH_INGREDIENTS_NOT_IN_STOCK": "Some ingredients are not in your stock",
-  "VALIDATION_INVALID_URL": "Invalid link"
+  "VALIDATION_INVALID_URL": "Invalid link",
+  "VALIDATION_INVALID_DATETIME": "Invalid date",
+  "MENU_SET_NOT_FOUND": "Menu set not found",
+  "MENU_SET_DISHES_INVALID": "Some dishes are invalid or no longer available",
+  "EVENT_NOT_FOUND": "Event not found",
+  "EVENT_DISHES_INVALID": "Some dishes are invalid or archived",
+  "EVENT_MENU_SETS_INVALID": "Some menu sets are invalid or archived",
+  "VENDOR_PRESET_EXISTS": "A template with this name already exists",
+  "VENDOR_PRESET_NOT_FOUND": "Template not found",
+  "VALIDATION_ARRAY_MIN": "Add at least one item"
 }

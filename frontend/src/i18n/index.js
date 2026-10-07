@@ -30,6 +30,12 @@ import kmIngredients from './locales/km/ingredients.json';
 import enIngredients from './locales/en/ingredients.json';
 import kmDishes from './locales/km/dishes.json';
 import enDishes from './locales/en/dishes.json';
+import kmMenuSets from './locales/km/menuSets.json';
+import enMenuSets from './locales/en/menuSets.json';
+import kmEvents from './locales/km/events.json';
+import enEvents from './locales/en/events.json';
+import kmDashboard from './locales/km/dashboard.json';
+import enDashboard from './locales/en/dashboard.json';
 
 export const SUPPORTED_LANGS = ['km', 'en'];
 export const DEFAULT_LANG = 'km';
@@ -43,23 +49,25 @@ i18n.use(initReactI18next).init({
   fallbackLng: DEFAULT_LANG,
   supportedLngs: SUPPORTED_LANGS,
   ns: [
-    'common', 'login', 'register', 'verify', 'reset', 'profile', 
-    'onboarding', 'subscription', 'errors', 'payment', 'billing', 
-    'catalog', 'ingredients', 'dishes'
+    'common', 'login', 'register', 'verify', 'reset', 'profile', 'onboarding',
+    'subscription', 'errors', 'payment', 'billing', 'catalog', 'ingredients',
+    'dishes', 'menuSets', 'events', 'dashboard',
   ],
   defaultNS: 'common',
   resources: {
     km: {
       common: kmCommon, login: kmLogin, register: kmRegister, verify: kmVerify,
       reset: kmReset, profile: kmProfile, onboarding: kmOnboarding,
-      subscription: kmSubscription, errors: kmErrors, payment: kmPayment, 
-      billing: kmBilling, catalog: kmCatalog, ingredients: kmIngredients, dishes: kmDishes,
+      subscription: kmSubscription, errors: kmErrors, payment: kmPayment, billing: kmBilling,
+      catalog: kmCatalog, ingredients: kmIngredients,
+      dishes: kmDishes, menuSets: kmMenuSets, events: kmEvents, dashboard: kmDashboard,
     },
     en: {
       common: enCommon, login: enLogin, register: enRegister, verify: enVerify,
       reset: enReset, profile: enProfile, onboarding: enOnboarding,
-      subscription: enSubscription, errors: enErrors, payment: enPayment, 
-      billing: enBilling, catalog: enCatalog, ingredients: enIngredients, dishes: enDishes,
+      subscription: enSubscription, errors: enErrors, payment: enPayment, billing: enBilling,
+      catalog: enCatalog, ingredients: enIngredients,
+      dishes: enDishes, menuSets: enMenuSets, events: enEvents, dashboard: enDashboard,
     },
   },
   interpolation: { escapeValue: false },
